@@ -1,0 +1,56 @@
+\documentclass [a4paper,12pt,openany,italian,oneside]{book}
+\usepackage[italian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{indentfirst}
+\usepackage[font={small,it},labelfont=bf]{caption}
+\usepackage{verbatim}
+\usepackage{natbib}
+\usepackage[nottoc,notlot,notlof]{tocbibind}
+\usepackage[plainpages=false]{hyperref}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+\bibliographystyle{plain}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{3}
+
+\newlist{Properties}{enumerate}{1}
+\setlist[Properties]{label=\textbf{Proprietà \arabic*.},itemindent=* }
+\algnewcommand{\LeftComment}[1]{\Statex \(\triangleright\) #1}
+
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+\begin{document}
+
+%parte iniziale
+\frontmatter
+\pagestyle{plain}
+\include{frontespizio}
+\include{dedica}
+\include{010-introduzione}
+
+\tableofcontents
+
+%inizio capitoli
+\mainmatter
+\pagestyle{headings}
+\include{020-background}
+\include{030-stato-arte}
+\include{040-architettura}
+\backmatter
+\include{050-conclusione}
+\include{ringraziamenti}
+
+%bibliografia
+\nocite{*}
+\bibliography{bibliografia}
+
+\end{document}
