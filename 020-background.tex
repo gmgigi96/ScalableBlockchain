@@ -10,11 +10,46 @@ Il concetto fondamentale di Bitcoin è quello di \emph{transazione}: una transaz
 	\item creazione di bitcoin: ogni nodo che aggiunge un blocco alla blockchain viene ricompensato dalla rete con una quantità di bitcoin fissata per ogni blocco e che decresce nel tempo;
 	\item validazione delle transazioni secondo le regole di consenso, assicurando che le transazioni siano non valide e non corrette.
 \end{enumerate}
-Inizialmente il mining veniva effettuato da personal computer potenti. Man mano che i miners si aggiungevano alla rete Bitcoin, per cui diveniva sempre più difficile \emph{minare} un blocco, si utilizzarono delle Graphical Processing Units, o GPU, come quelle utilizzate nei videogiochi. Tuttavia negli ultimi tempi si utilizzano sistemi Application Specific Integrated Circuit, o ASIC, che implementano in hardware gli algoritmi di mining impiegati in Bitcoin per aumentare le performance. Sono state create anche soluzioni che hanno l'obiettivo di condividere la propria potenza computazionale in mining farm con vari partecipanti, in cui si suddividono i bitcoin guadagnati.
+Inizialmente il mining veniva effettuato da personal computer potenti. Man mano che i miners si aggiungevano alla rete Bitcoin, per cui diveniva sempre più difficile \emph{minare} un blocco, si utilizzarono delle Graphical Processing Units, o GPU, come quelle utilizzate nei videogiochi. Tuttavia negli ultimi anni, a causa dell'elevato numero di miner presenti sulla rete, si utilizzano sistemi Application Specific Integrated Circuit, o ASIC, che implementano in hardware gli algoritmi di mining impiegati in Bitcoin per aumentare le performance. Sono state create anche soluzioni che hanno l'obiettivo di condividere la propria potenza computazionale in mining farm con vari partecipanti, in cui si suddividono i bitcoin guadagnati.
 
 \subsection{Wallet e chiavi private}
 
 \subsection{Transazioni}
+Le transazioni ricoprono un ruolo fondamentale in Bitcoin e nelle tecnologie di blockchain in generale. Le transazioni sono delle strutture dati che codificano un trasferimento di bitcoin da una o più sorgenti, denominate \emph{input}, ad una o più destinazioni, denominate \emph{output}. I campi di una transazione sono riportati nella Tabella~\ref{tab:tx_fields}.
+
+\todo{cambiare stile tabella}
+\begin{table}[ht]1
+	\centering
+	\begin{tabular}[t]{lcc}
+		\toprule
+		Dimensione&Campo&Descrizione\\
+		\midrule
+		4 byte&Versione&Specifica la versione del protocollo\\
+		1-9 byte&Contatore input&Indica quanti input sono inclusi\\
+		variabile&Input&Lista di uno o più input\\
+		1-9 byte&Contatore output&Indica quanti output sono inclusi\\
+		variabile&Output&Lista di uno o più output\\
+		4 byte&Time&Timestamp Unix\\
+		\bottomrule
+	\end{tabular}
+	\caption{I campi di una transazione.}
+	\label{tab:tx_fields}
+\end{table}
+
+Non esiste il concetto di conto relativo ad un account Bitcoin, per cui le transazioni formalmente non spostano valuta da un conto all'altro. In altre parole non esiste un database o una DHT come si vedrà in altre tecnologie blockchain presentate nei prossimi paragrafi, ma i bitcoin posseduti da un certo indirizzo derivano scandendo tutta la blockchain dal blocco iniziale al blocco attuale, considerando le \emph{unspent transactions output}, o UTXO. Le UTXO sono i mattoncini con cui vengono generate le transazioni e sono quelle transazioni, registrate nella blockchain, a cui è associato un valore espresso in \emph{satoshi}, dove 1 satoshi è equivalente a $10^{-8}$ bitcoin, e bloccate da un segreto di cui è a conoscenza solo il possessore. I satoshi corrispondono ai centesimi presenti nelle valute tradizionali, come l'Euro o il Dollaro, solo che, a differenza di queste ultime in cui l'unità di base può essere suddivisa massimo in 100 parti, il bitcoin, può essere suddiviso fino a 100 milioni di parti.
+
+Le UTXO sono generate a partire dall'output di una transazione, aggiunta in un blocco della blockchain, che non è stata ancora spesa in un'altra transazione. Gli output di una transazione consistono in due parti:
+
+\begin{enumerate}
+	\item il valore espresso in satoshi da trasferire;
+	\item un \emph{locking script}, che specifica il modo in cui i bitcoin possono essere sbloccati.
+\end{enumerate}
+
+Per semplicità un locking script può essere pensato come l'indirizzo della destinazione, che diventerà, una volta che la transazione è stata accettata e quindi aggiunta in un blocco della blockchain, il proprietario della quantità di bitcoin indicati nella transazione stessa.
+
+Gli input in una transazione sono riferimenti ad UTXO. In particolare specificano l'UTXO da utilizzare come sorgente tramite l'hash della transazione e l'indice dell'UTXO nella transazione considerata. Il creatore della transazione deve includere un \emph{unlocking script} per ogni UTXO, contenente una firma che dimostri che il peer che ha creato la transazione è proprietario di quei bitcoin.
+
+\todo{Parlare delle fee}
 
 \subsection{Mining}
 
