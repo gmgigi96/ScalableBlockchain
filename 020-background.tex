@@ -15,12 +15,15 @@ Inizialmente il mining veniva effettuato da personal computer potenti. Man mano 
 \subsection{Wallet e chiavi private}
 
 \subsection{Transazioni}
+
+\todo{ciclo di vita transazione}
+
 Le transazioni ricoprono un ruolo fondamentale in Bitcoin e nelle tecnologie di blockchain in generale. Le transazioni sono delle strutture dati che codificano un trasferimento di bitcoin da una o più sorgenti, denominate \emph{input}, ad una o più destinazioni, denominate \emph{output}. I campi di una transazione sono riportati nella Tabella~\ref{tab:tx_fields}.
 
-\todo{cambiare stile tabella}
-\begin{table}[ht]1
+\change{cambiare stile tabella}
+\begin{table}
 	\centering
-	\begin{tabular}[t]{lcc}
+	\begin{tabular}{lll}
 		\toprule
 		Dimensione&Campo&Descrizione\\
 		\midrule
@@ -49,7 +52,16 @@ Per semplicità un locking script può essere pensato come l'indirizzo della des
 
 Gli input in una transazione sono riferimenti ad UTXO. In particolare specificano l'UTXO da utilizzare come sorgente tramite l'hash della transazione e l'indice dell'UTXO nella transazione considerata. Il creatore della transazione deve includere un \emph{unlocking script} per ogni UTXO, contenente una firma che dimostri che il peer che ha creato la transazione è proprietario di quei bitcoin.
 
-\todo{Parlare delle fee}
+Molte transazioni includono delle \emph{tasse}. Esse hanno un triplice scopo. Il primo è incentivare i miner a scegliere la propria transazione. I miner, oltre a ricevere un compenso per la creazione del blocco, ricevono le tasse di tutte le transazioni presenti nel blocco creato. Infatti, quando i miner provano a generare un blocco, scelgono dal proprio pool di transazioni in attesa quelle con le tasse più alte. Il secondo è quello di incentivare un peer ad essere un miner, in modo tale che la rete sia più sicura. Come si vedrà successivamente la sicurezza dell'intero sistema aumenta con l'aumentare dei nodi che partecipano alla rete. L'ultimo, disincentiva nodi malevoli a \emph{spam} di transazioni, perchè questi si troverebbero a spendere una piccola quota in tasse per ogni transazione generata. La quantità di tasse da pagare per una transazione normalmente dipende dalla dimensione in byte delle transazioni, in genere sui 370 byte, ma molto dipende dalle richieste di mercato. Al momento di scrittura di questa tesi, per una transazione di circa 370 byte composta da 2 input e 2 output, affinchè sia accettata entro 2 blocchi, quindi entro 20 minuti, sono necessari 34k satoshi, pari a 3.20 USD (fonte~\cite{bitcoin_fee_calculator}).
+
+Come si è visto, nella struttura dati di una transazione non è presente un campo tasse esplicito. Le tasse sono infatti implicite e sono calcolate da ogni miner come la differenza tra la somma degli input e la somma degli output. In formule,
+\begin{equation*}
+	Tasse = \sum T_{in} - \sum T_{out}
+\end{equation*}
+dove $T_{in}$ e $T_{out}$ indicano l'input e l'output di una transazione $T$, rispettivamente.
+
+Gli script sono il sistema con cui i peer Bitcoin validano le transazioni. Come si è detto in precedenza, ad ogni UTXO è associato un locking script, che rappresenta le condizioni che un nodo deve soddisfare per usare i bitcoin contenuti in esso. L'input di una transazione, riferito ad uno specifico UTXO, deve fornire un unlocking script, che contiene solitamente una firma che sblocca i fondi. Durante la validazione di una transazione, il peer esegue prima l'unlocking script e usa il suo output come input per il locking script. Se non ci sono errori e le condizioni nel locking script sono soddisfatte, ovvero l'intera operazione restituisce \emph{true}, allora la transazione è considerata valida.
+Gli script sono scritti in un linguaggio stack-based, in cui sono presenti istruzioni aritmentico-logiche, istruzioni per il caloclo di hash, di verifiche di chiavi pubbliche, condizioni, ma non loop, il che lo rendono un linguaggio \emph{Turing incompleto}. Questo fa si che non è possibile creare un loop infinito e causare quindi un \emph{Denial-of-Service}. Grazie ad un linguaggio di scripting è possibile scrivere un'infinità di script che danno modo di esprimere qualsiasi condizione. La più usata è certamente la \emph{Pay to public key hash}, nota anche con P2PKH, che consente di specificare l'indirizzo Bitcoin a cui trasferire una certa somma di bitcoin. Ma è possibile creare fondi sbloccabili solo da più utenti insieme, o combinazioni più bizzarre o anche da una certa data in poi. Questi sono solo alcuni degli esempi che è possibile creare.
 
 \subsection{Mining}
 
