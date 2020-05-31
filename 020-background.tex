@@ -16,11 +16,11 @@ Inizialmente il mining veniva effettuato da personal computer potenti. Man mano 
 
 \subsection{Transazioni}
 
-\todo{ciclo di vita transazione}
-
 Le transazioni ricoprono un ruolo fondamentale in Bitcoin e nelle tecnologie di blockchain in generale. Le transazioni sono delle strutture dati che codificano un trasferimento di bitcoin da una o più sorgenti, denominate \emph{input}, ad una o più destinazioni, denominate \emph{output}. I campi di una transazione sono riportati nella Tabella~\ref{tab:tx_fields}.
-
 \change{cambiare stile tabella}
+
+Vediamo ora il ciclo di vita di una transazione. Ogni nodo nella rete può generare una transazione. Il nodo durante la creazione può essere online o offline. La transazione contiene una firma che dimostra che il nodo possiede i bitcoin specificati nell'input. La transazione viene quindi inviata in broadcast, raggiungendo tutti i nodi della rete. Questa viene messa nella lista delle transazioni in attesa, \emph{pending transactions}, verificata da ogni nodo, e se è valida, ovvero è conforme alle regole di consenso, viene inclusa all'interno di un blocco insieme ad altre transazioni e aggiunta in coda alla blockchain.
+
 \begin{table}
 	\centering
 	\begin{tabular}{lll}
