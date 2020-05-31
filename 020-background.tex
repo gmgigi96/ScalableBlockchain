@@ -61,11 +61,21 @@ Come si è visto, nella struttura dati di una transazione non è presente un cam
 dove $T_{in}$ e $T_{out}$ indicano l'input e l'output di una transazione $T$, rispettivamente.
 
 Gli script sono il sistema con cui i peer Bitcoin validano le transazioni. Come si è detto in precedenza, ad ogni UTXO è associato un locking script, che rappresenta le condizioni che un nodo deve soddisfare per usare i bitcoin contenuti in esso. L'input di una transazione, riferito ad uno specifico UTXO, deve fornire un unlocking script, che contiene solitamente una firma che sblocca i fondi. Durante la validazione di una transazione, il peer esegue prima l'unlocking script e usa il suo output come input per il locking script. Se non ci sono errori e le condizioni nel locking script sono soddisfatte, ovvero l'intera operazione restituisce \emph{true}, allora la transazione è considerata valida.
-Gli script sono scritti in un linguaggio stack-based, in cui sono presenti istruzioni aritmentico-logiche, istruzioni per il caloclo di hash, di verifiche di chiavi pubbliche, condizioni, ma non loop, il che lo rendono un linguaggio \emph{Turing incompleto}. Questo fa si che non è possibile creare un loop infinito e causare quindi un \emph{Denial-of-Service}. Grazie ad un linguaggio di scripting è possibile scrivere un'infinità di script che danno modo di esprimere qualsiasi condizione. La più usata è certamente la \emph{Pay to public key hash}, nota anche con P2PKH, che consente di specificare l'indirizzo Bitcoin a cui trasferire una certa somma di bitcoin. Ma è possibile creare fondi sbloccabili solo da più utenti insieme, o combinazioni più bizzarre o anche da una certa data in poi. Questi sono solo alcuni degli esempi che è possibile creare.
+Gli script sono scritti in un linguaggio stack-based, in cui sono presenti istruzioni aritmentico-logiche, istruzioni per il calcolo di hash, di verifiche di chiavi pubbliche, condizioni, ma non loop, il che lo rendono un linguaggio \emph{Turing incompleto}. Questo fa si che non è possibile creare un loop infinito e causare quindi un \emph{Denial-of-Service}. Grazie ad un linguaggio di scripting è possibile scrivere un'infinità di script che danno modo di esprimere qualsiasi condizione. La più usata è certamente la \emph{Pay to public key hash}, nota anche con P2PKH, che consente di specificare l'indirizzo Bitcoin a cui trasferire una certa somma di bitcoin. Ma è possibile creare fondi sbloccabili solo da più utenti insieme, o combinazioni più bizzarre o anche da una certa data in poi. Questi sono solo alcuni degli esempi che è possibile creare.
 
 \subsection{Mining}
+\todo[inline]{sezione mining}
+
+\subsection{Blockchain}
+
+La blockchain è il registro contenente tutte le transazioni accettate, condivisa da tutti i nodi della rete. Essa è una lista semplicemente collegata i cui nodi sono i blocchi. I blocchi sono connessi al contrario, per cui ogni blocco punta al nodo precedente. Ogni blocco è identificato da un hash crittografico, calcolato con l'algoritmo SHA256 sull'header del blocco stesso. Ogni blocco punta al nodo precedente specificandone l'hash. La sequenza di blocchi crea quindi una catena, fino ad arrivare al primo blocco creato, denominato \emph{genesis block}, creato nel 2009, e direttamente codificato nel client software di Bitcoin, per cui conosciuto da tutti i nodi della rete.
+
+Un blocco è un contenitore formato da una sezione metadati, composto dalla dimensione del blocco stesso, da un block header di 80 byte e dalla lista di transazioni validate. Il block header è composto dall'hash del precedente blocco, dal \emph{root hash} del Merkle Tree formato dalle transazioni contenute nel blocco, un \emph{timestamp}, ovvero il tempo di creazione approssimato del blocco, un \emph{difficulty target} e un \emph{nounce}, utilizzati nella fase di mining.
+La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.\todo{fare figura blockchain bitcoin}
+
 
 \subsection{Attacchi noti}
+\todo[inline]{sezione attacchi noti - eclipse attack, ecc..}
 
 \section{Trilemma}
 
