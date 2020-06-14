@@ -13,6 +13,7 @@ Il concetto fondamentale di Bitcoin è quello di \emph{transazione}: una transaz
 Inizialmente il mining veniva effettuato da personal computer potenti. Man mano che i miners si aggiungevano alla rete Bitcoin, per cui diveniva sempre più difficile \emph{minare} un blocco, si utilizzarono delle Graphical Processing Units, o GPU, come quelle utilizzate nei videogiochi. Tuttavia negli ultimi anni, a causa dell'elevato numero di miner presenti sulla rete, si utilizzano sistemi Application Specific Integrated Circuit, o ASIC, che implementano in hardware gli algoritmi di mining impiegati in Bitcoin per aumentare le performance. Sono state create anche soluzioni che hanno l'obiettivo di condividere la propria potenza computazionale in mining farm con vari partecipanti, in cui si suddividono i bitcoin guadagnati.
 
 \subsection{Wallet e chiavi private}
+\todo[inline]{sezione wallet e chiavi private}
 
 \subsection{Transazioni}
 
@@ -87,11 +88,11 @@ Quando gli altri miner ricevono il blocco minato da un altro miner, smettono di 
 Può capitare che due miner nella rete trovino riescano a minare quasi contemporaneamente un blocco, per cui i vicini potrebbero lavorare a loro volta su viste della blockchain differenti. Questo genera nella blockchain delle \emph{fork}, per cui i nodi nella rete hanno visioni differenti della blockchain stessa. Questo problema viene risolto da ogni nodo scegliendo il ramo più lungo, in questo modo si converge ad una visione comune della blockchain.
 
 
-\subsection{Blockchain}
+\subsection{Blockchain}\label{sec:blockchain}
 
 La blockchain è il registro contenente tutte le transazioni accettate, condivisa da tutti i nodi della rete. Essa è una lista semplicemente collegata i cui nodi sono i blocchi. I blocchi sono connessi al contrario, per cui ogni blocco punta al nodo precedente. Ogni blocco è identificato da un hash crittografico, calcolato con l'algoritmo SHA256 sull'header del blocco stesso. Ogni blocco punta al nodo precedente specificandone l'hash. La sequenza di blocchi crea quindi una catena, fino ad arrivare al primo blocco creato, denominato \emph{genesis block}, creato nel 2009, e direttamente codificato nel client software di Bitcoin, per cui conosciuto da tutti i nodi della rete.
 
-Un blocco è un contenitore formato da una sezione metadati, composto dalla dimensione del blocco stesso, da un block header di 80 byte e dalla lista di transazioni validate. Il block header è composto dall'hash del precedente blocco, dal \emph{root hash} del Merkle Tree formato dalle transazioni contenute nel blocco, un \emph{timestamp}, ovvero il tempo di creazione approssimato del blocco, un \emph{difficulty target} e un \emph{nounce}, utilizzati nella fase di mining.
+Un blocco è un contenitore formato da una sezione metadati, composto dalla dimensione del blocco stesso, da un block header di 80 byte e dalla lista di transazioni validate. Il block header è composto dall'hash del precedente blocco, dal \emph{root-hash} del Merkle Tree formato dalle transazioni contenute nel blocco, un \emph{timestamp}, ovvero il tempo di creazione approssimato del blocco, un \emph{difficulty target} e un \emph{nounce}, utilizzati nella fase di mining.
 La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.\todo{fare figura blockchain bitcoin}
 
 
@@ -100,4 +101,64 @@ La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.\todo{far
 
 \section{Trilemma}
 
-\section{MHT}
+\section{Strutture dati autenticate}
+
+Come si è visto nella Paragrafo~\ref{sec:blockchain}, ogni block header della blockchain contiene un riassunto di tutte le transazioni presenti nel blocco, denominato \emph{root-hash}, ed ottenuto da un Merkle Tree. Esso fa parte della famiglia delle \emph{strutture dati autenticate}.
+
+Una struttura dati autenticata (ADS) è una struttura dati contenente valori che permette una verifica di integrità, ovvero un client fidato può verificare l'autenticità di una risposta ottenuta da un server non fidato mediante una prova, denominata \emph{proof}. In altre parole, le operazioni effettuate da una parte esterna non fidata, denominato \emph{prover}, possono essere verificate efficientemente da un client, il \emph{verifier}.
+
+Supponiamo di trovarci nel seguente scenario. Un client ha bisogno di memorizzare una certa quantità di dati che eccede le sue disponibilità di memorizzazione fisica. Può memorizzare i suoi dati su un server esterno che ha una grande capacità di memorizzazione, come ad esempio un servizio di cloud storage. Il client vuole essere sicuro che la versione dei file che memorizza in cloud sia l'ultima e che nessuno possa modificare il contenuto dei suoi file. Questo problema può essere risolto mediante le strutture dati autenticate, senza che il client memorizzi l'intera struttura dati e senza memorizzare l'hash di ogni singolo file. In quest'ultimo caso infatti dovrebbe memorizzare un numero di hash lineare con il numero di file che ha memorizzato in cloud. Applicazioni del genere sono molto frequenti, anche nel caso di Bitcoin, in cui esistono client \emph{leggeri}, i cosiddetti \emph{thin client}, che memorizzano solo l'header dei blocchi della blockchain, mentre tutte le transazioni contenute nei blocchi sono memorizzati su un server esterno. Una realizzazione di un protocollo efficiente che fa uso di ADS si può trovare in \cite{pennino2019pipeline} e \cite{gdm}.
+
+Un'implementazione efficiente di un'ADS è il Merkle Tree, utilizzato per la realizzazione di dizionari autenticati. Dato un insieme di elementi $V$, il Merkle Tree $T$ è un albero binario completo bilanciato avente come foglie gli hash degli elementi in $V$, mentre i nodi intermedi sono il risultato dell'hash della concatenazione dei nodi figli. Il root di $T$ contiene il \emph{root-hash} di $T$. La Figura~\ref{fig:mht}\todo{inserire figura mht} mostra un esempio di Merkle Tree.
+Come ogni ADS, ad una richiesta \emph{T.get(k)}, dove si richiede il valore $v$ associato alla chiave $k$, si ottiene anche una \emph{proof} associata a $v$. La proof è una struttura dati utile a verificare l'integrità del valore a cui è associata. In particolare, in un Merkle Tree la proof si ottiene dall'Algoritmo~\ref{alg:proof}.
+
+\begin{algorithm}
+	\caption{Calcolo della proof in un albero $T$ associata alla chiave $k$}
+	\begin{algorithmic}
+		\Procedure{get\_proof}{$k$}
+			\State{Sia $n$ la foglia di $T$ associato a $k$}
+			\State{Sia $p$ il cammino da $v$ al root}
+			\State{$P \leftarrow [~]$}
+			\While{$n.parent \neq T.root$}
+				\If{$n.parent.right = n$}	\Comment{$n$ è un figlio destro}
+					\State $Tag \leftarrow R$
+					\State $h_f \leftarrow n.parent.left.value$
+				\Else										\Comment{$n$ è un figlio sinistro}
+					\State $Tag \leftarrow L$
+					\State $h_f \leftarrow n.parent.right.value$
+				\EndIf
+				\State{$P.$\Call{append}{$(Tag, h_f)$}}
+				\State{$n \leftarrow n.parent$}
+			\EndWhile
+			\Return $P$
+		\EndProcedure
+	\end{algorithmic}
+	\label{alg:proof}
+\end{algorithm}
+
+ sia $p$ il cammino, ovvero i nodi attraversati, da $v$ al nodo root (escluso). Per ogni nodo $n$ in $p$, si considera la coppia, in cui il primo elemento è un'etichetta e il secondo elemento è il contenuto di un nodo, ovvero un'hash. L'etichetta può assumere due valori, $R$ e $L$, destra e sinistra rispettivamente, in base al fatto che $n$ sia un figlio destro o sinistro di suo padre, e il secondo elemento contiene l'hash del fratello di $n$. La proof è la lista di queste coppie prese nell'ordine di attraversamento di $p$. La Figura~\ref{fig:mht_proof} mostra un esempio di proof, rappresentata con linee tratteggiate per il valore ???. Considerato il cammino $p$ da ??? al root, rappresentato in figura con una linea punteggiata, si selezionano i nodi ???, fratelli dei nodi percorsi in $p$. La proof risultante è quindi la lista di coppie [(???, ???)].
+
+Un Merkle Tree utilizza uno spazio $O(|V|)$ e una dimensione della proof, un tempo per una query ed un tempo di verifica pari a $O(\log{|V|})$.
+
+Un client possiede solo una copia locale del root-hash, mentre i dati sono su un server non fidato, ad esempio su cloud. Per verificare la veridicità del valore $v$ associato alla chiave $k$ ottenuto a seguito di una richiesta di \emph{get(k)} al server, il client calcola il root-hash dalla proof associata a $v$ e da $v$ stesso, con l'Algoritmo~\ref{alg:rh_proof}.
+
+\begin{algorithm}
+	\caption{Calcolo del root hash dalla proof}
+	\begin{algorithmic}
+		\Procedure{roothash\_from\_proof}{$p,v$}
+			\State $h_1 = hash(v)$
+			\State $L = len(p)$
+			\For{$i \leftarrow 1$ to $L$}
+				\State $Tag, h_{p_i} \leftarrow p[i]$
+				\If{$Tag = R$}
+					\State $h_{i+1} \leftarrow hash(h_{p_i} \oplus h_i)$	\Comment{$\oplus$: concatenazione degli hash}
+				\Else
+					\State $h_{i+1} \leftarrow hash(h_i \oplus h_{p_i})$				
+				\EndIf
+			\EndFor
+			\Return $h_L$
+		\EndProcedure
+	\end{algorithmic}
+	\label{alg:rh_proof}
+\end{algorithm}
+
