@@ -136,7 +136,7 @@ Come ogni ADS, ad una richiesta \emph{T.get(k)}, dove si richiede il valore $v$ 
 	\label{alg:proof}
 \end{algorithm}
 
- sia $p$ il cammino, ovvero i nodi attraversati, da $v$ al nodo root (escluso). Per ogni nodo $n$ in $p$, si considera la coppia, in cui il primo elemento è un'etichetta e il secondo elemento è il contenuto di un nodo, ovvero un'hash. L'etichetta può assumere due valori, $R$ e $L$, destra e sinistra rispettivamente, in base al fatto che $n$ sia un figlio destro o sinistro di suo padre, e il secondo elemento contiene l'hash del fratello di $n$. La proof è la lista di queste coppie prese nell'ordine di attraversamento di $p$. La Figura~\ref{fig:mht_proof} mostra un esempio di proof, rappresentata con linee tratteggiate per il valore ???. Considerato il cammino $p$ da ??? al root, rappresentato in figura con una linea punteggiata, si selezionano i nodi ???, fratelli dei nodi percorsi in $p$. La proof risultante è quindi la lista di coppie [(???, ???)].
+La Figura~\ref{fig:mht_proof} mostra un esempio di proof, rappresentata con linee tratteggiate per il valore ???. Considerato il cammino $p$ da ??? al root, rappresentato in figura con una linea punteggiata, si selezionano i nodi ???, fratelli dei nodi percorsi in $p$. La proof risultante è quindi la lista di coppie [(???, ???)].
 
 Un Merkle Tree utilizza uno spazio $O(|V|)$ e una dimensione della proof, un tempo per una query ed un tempo di verifica pari a $O(\log{|V|})$.
 
