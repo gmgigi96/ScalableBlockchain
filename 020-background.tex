@@ -10,10 +10,18 @@ Il concetto fondamentale di Bitcoin è quello di \emph{transazione}: una transaz
 	\item creazione di bitcoin: ogni nodo che aggiunge un blocco alla blockchain viene ricompensato dalla rete con una quantità di bitcoin fissata per ogni blocco e che decresce nel tempo;
 	\item validazione delle transazioni secondo le regole di consenso, assicurando che le transazioni siano non valide e non corrette.
 \end{enumerate}
-Inizialmente il mining veniva effettuato da personal computer potenti. Man mano che i miners si aggiungevano alla rete Bitcoin, per cui diveniva sempre più difficile \emph{minare} un blocco, si utilizzarono delle Graphical Processing Units, o GPU, come quelle utilizzate nei videogiochi. Tuttavia negli ultimi anni, a causa dell'elevato numero di miner presenti sulla rete, si utilizzano sistemi Application Specific Integrated Circuit, o ASIC, che implementano in hardware gli algoritmi di mining impiegati in Bitcoin per aumentare le performance. Sono state create anche soluzioni che hanno l'obiettivo di condividere la propria potenza computazionale in mining farm con vari partecipanti, in cui si suddividono i bitcoin guadagnati.
+Inizialmente il mining veniva effettuato da personal computer potenti. Man mano che i miner si aggiungevano alla rete Bitcoin, per cui diveniva sempre più difficile \emph{minare} un blocco, si utilizzarono delle Graphical Processing Units, o GPU, come quelle utilizzate nei videogiochi. Tuttavia negli ultimi anni, a causa dell'elevato numero di miner presenti sulla rete, si utilizzano sistemi Application Specific Integrated Circuit, o ASIC, che implementano in hardware gli algoritmi di mining impiegati in Bitcoin per aumentare le performance. Sono state create anche soluzioni che hanno l'obiettivo di condividere la propria potenza computazionale in mining farm, o mining pool, con diversi partecipanti, in cui si suddividono i bitcoin guadagnati.
 
-\subsection{Wallet e chiavi private}
-\todo[inline]{sezione wallet e chiavi private}
+\subsection{Wallet e indirizzi digitali}
+Un nodo per partecipare alla rete e scambiare i propri bitcoin, ha bisogno di una \emph{chiave digitale} e di un \emph{bitcoin address}. Un utente può generare un numero qualsiasi di chiavi digitali, che vengono memorizzate in un database locale, denominato \emph{wallet}.
+La possibilità di generate autonomamente delle chiavi evidenza la caratteristica fondamentale di Bitcoin, ovvero quella della decentralizzazione del controllo e del consenso, basate su prove crittografiche.
+In particolare, il modello di riferimento è quello della crittografia a chiave asimmetrica, in cui le chiavi digitali sono sottoforma di una coppia di chiavi, una \emph{privata}, segreta, ed una \emph{pubblica}, che deriva dalla chiave privata. \'E importante specificare che l'uso della crittografia non ha uno scopo di \emph{confidenzialità}, d'altronde tutto in Bitcoin viaggia in chiaro, ma per \emph{autenticità}, per dimostrare quindi chi si dice di essere, ovvero possessori di un certo conto.
+Secondo una relazione matematica, la chiave privata può essere usata per firmare un messaggio, o in questo caso una transazione,  e la chiave pubblica, conosciuta da tutti i nodi della rete, per validare la firma del messaggio. Infatti, semplicisticamente, la chiave pubblica è usata per ricevere i bitcoin, mentre la chiave privata per spenderli, secondo delle modalità che saranno note nel proseguimento della lettura dei prossimi paragrafi, in cui si mostra la creazione di una transazione da parte di un client, e quindi le prove crittografiche che deve mostrare in modo da poter spendere i suoi bitcoin.
+In una transazione, l'indirizzo di destinazione è indicato da un \emph{bitcoin address}, che deriva dalla chiave privata del client, mediante una serie di funzioni hash, come illustrato nella Figura~\ref{img:bit_address}.\todo{inserire immagine di come un indirizzo bitcoin deriva da una chiave pubblica}
+Quando un nodo spende i propri bitcoin, associati al bitcoin address del nodo stesso, presenta la sua chiave pubblica e la firma di una certa stringa che dimostra che effettivamente lui è il proprietario di quella somma. In questo modo, chiunque nella rete, con queste due informazioni, può verificare che il nodo è realmente il proprietario di una certa quantità di bitcoin spesi in una transazione. \'E chiaro che chiunque in possesso della chiave privata di un nodo, può spendere a suo piacimento i bitcoin associati al relativo bitcoin address. Per questo, e anche per anonimizzare i creatori delle transazioni, un wallet genera ad ogni transazione una nuova coppia di chiavi.
+
+Un waller, come si già è detto in precedenza, è un client che memorizza le chiavi digitali di un nodo. Può essere: (1) \emph{non-deterministico} e generare chiavi private in modo totalmente randomico, per cui il waller è un database che memorizza queste chiavi private, e (2) \emph{deterministico} e generare delle chiavi private a partire da un unico \emph{seed}, che può essere anche una password digitata da un utente, per cui non ha bisogno di memorizzare alcuna chiave.
+
 
 \subsection{Transazioni}
 
@@ -124,7 +132,7 @@ L'eclipse attack è un attacco perpetrato ai danni di una singola vittima. Un at
 
 \section{Strutture dati autenticate}
 
-Come si è visto nella Paragrafo~\ref{sec:blockchain}, ogni block header della blockchain contiene un riassunto di tutte le transazioni presenti nel blocco, denominato \emph{root-hash}, ed ottenuto da un Merkle Tree. Esso fa parte della famiglia delle \emph{strutture dati autenticate}.
+Come si è visto nella Paragrafo~\ref{sec:blockchain}, ogni block header della blockchain contiene un riassunto di tutte le transazioni presenti nel blocco, denominato \emph{root-hash}, ed ottenuto da un Merkle Tree (MHT). Esso fa parte della famiglia delle \emph{strutture dati autenticate}.
 
 Una struttura dati autenticata (ADS) è una struttura dati contenente valori che permette una verifica di integrità, ovvero un client fidato può verificare l'autenticità di una risposta ottenuta da un server non fidato mediante una prova, denominata \emph{proof}. In altre parole, le operazioni effettuate da una parte esterna non fidata, denominato \emph{prover}, possono essere verificate efficientemente da un client, il \emph{verifier}.
 
@@ -134,7 +142,7 @@ Un'implementazione efficiente di un'ADS è il Merkle Tree, utilizzato per la rea
 Come ogni ADS, ad una richiesta \emph{T.get(k)}, dove si richiede il valore $v$ associato alla chiave $k$, si ottiene anche una \emph{proof} associata a $v$. La proof è una struttura dati utile a verificare l'integrità del valore a cui è associata. In particolare, in un Merkle Tree la proof si ottiene dall'Algoritmo~\ref{alg:proof}.
 
 \begin{algorithm}
-	\caption{Calcolo della proof in un albero $T$ associata alla chiave $k$}
+	\caption{Calcolo della proof in un MHT $T$ associata alla chiave $k$}
 	\begin{algorithmic}
 		\Procedure{get\_proof}{$k$}
 			\State{Sia $n$ la foglia di $T$ associato a $k$}
