@@ -13,8 +13,18 @@
 \usepackage[nottoc,notlot,notlof]{tocbibind}
 \usepackage[plainpages=false]{hyperref}
 \usepackage{amsmath}
-\usepackage{algorithm}
+\usepackage[chapter]{algorithm}
 \usepackage[noend]{algpseudocode}
+\usepackage{booktabs}
+
+\floatname{algorithm}{Algoritmo}
+
+\usepackage{xargs}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=violet,backgroundcolor=violet!25,bordercolor=violet,#1]{#2}}
 
 \bibliographystyle{plain}
 \setcounter{tocdepth}{1}
@@ -35,6 +45,7 @@
 \pagestyle{plain}
 \include{frontespizio}
 \include{dedica}
+\listoftodos
 \include{010-introduzione}
 
 \tableofcontents
