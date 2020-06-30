@@ -148,7 +148,7 @@ La sicurezza deve essere il requisito fondamentale in una blockchain. Se la sicu
 \'E importante notare che il blockchain trilemma non è un teorema, come lo è il CAP theorem, un teorema fondamentale nell'ambito dei sistemi distribuiti. Esso sottolinea la difficoltà nel creare un sistema decentralizzato, sicuro e scalabile. Le blockchain sono ancora tecnologie giovani, poco mature per cui c'è ancora tanta strada da fare, in grado di migliorare ciò che già è stato fatto. Bitcoin, ad esempio, è una blockchain altamente sicura e decentralizzata, ma non scalabile: il numero di transazioni massime supportate è infatti di 7 TPS. Sebbene, non sarà utilizzabile a livello globale come unica valuta, rappresenta sicuramente un punto di svolta, dimostrando che una criptovaluta digitale in un sistema P2P, in cui non è necessario riporre la fiducia su un'autorità centrale o si è soggetti a regole imposte dalla medesima, è possibile e attuabile in pratica.
 
 
-\section{Strutture dati autenticate}
+\section{Strutture dati autenticate}\label{sec:ads}
 
 Come si è visto nella Paragrafo~\ref{sec:blockchain}, ogni block header della blockchain contiene un riassunto di tutte le transazioni presenti nel blocco, denominato \emph{root-hash}, ed ottenuto da un Merkle Tree (MHT). Esso fa parte della famiglia delle \emph{strutture dati autenticate}.
 
@@ -209,3 +209,7 @@ Un client possiede solo una copia locale del root-hash, mentre i dati sono su un
 	\label{alg:rh_proof}
 \end{algorithm}
 
+\todo{pruning ads}
+
+\section{DHT}
+\todo{sezione DHT}
