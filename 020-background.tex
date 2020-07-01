@@ -115,6 +115,9 @@ può sfruttare l'attacco 51\% per ottenere il 100\% delle ricompense dal mining,
 In una tecnologia come Bitcoin che incentiva economicamente i nodi a diventare miner e che ha raggiunto nel tempo un numero di nodi elevato, e quindi un grande hash power, un simile attacco è molto improbabile. Sicuramente non sono escluse da questo attacco le blockchain di piccole dimensioni, che hanno un hash power di gran lunga più piccolo di quello di Bitcoin: esempi di cripto-valute che sono state vittime del 51\% attack sono Monacoin, Bitcoin Gold e ZenCash. \improvement{inserire citazioni agli attacchi}
 In realtà l'avvento delle mining pool in Bitcoin, in cui più miner mettono a disposizione la propria potenza computazionale al servizio di un gruppo di più miner che divide il compenso in modo proporzionale all'hash power condiviso, apre la possibilità ad un'organizzazione del genere ad un 51\% attack se la somma totale dell'hash power di tutti i nodi iscritti supera il 50\% dell'intero hash power della rete. \'E stato il caso di \texttt{ghash.io}, in cui, dopo aver raggiunto nel gennaio del 2014 il 42\% dell'intera potenza computazionale della rete Bitcoin, molti miner si sono disiscritti dal pool e il pool stesso rilasciò una dichiarazione in cui rassicurava la comunità Bitcoin di evitare di raggiungere la soglia del 51\%~\cite{51-attack}.
 
+\paragraph{Sybil attack}
+\todo{fare sybil attack}
+
 \paragraph{Eclipse attack}
 L'eclipse attack è un attacco perpetrato ai danni di una singola vittima. Un attaccante, che controlla un gran numero di nodi, ad esempio una botnet, può isolare un nodo del resto della blockchain. Questo gli consente di mostrare una blockchain differente da quella che è in realtà e di sfruttare la potenza computazionale della vittima per i suoi comportamenti malevoli. Heilman et al.~\cite{heilman2015eclipse}, mostrano che è possibile utilizzare un attacco eclipse come base per altri attacchi:
 \todo{immagine eclipse attack - tipo http://cs-people.bu.edu/heilman/eclipse/eclipseicon1.png}
@@ -209,7 +212,20 @@ Un client possiede solo una copia locale del root-hash, mentre i dati sono su un
 	\label{alg:rh_proof}
 \end{algorithm}
 
-\todo{pruning ads}
+La tecnica della \emph{potatura}~\cite{ponnapalli2019scalable}, o \emph{pruning}, consente di ridurre lo spazio occupato da un Merkle Tree, qualora non sia necessario rispondere a query su un certo insieme di chiavi, preservando la capacità di generare proof per le chiavi necessarie. Si ottiene rimuovendo le foglie non necessarie e lasciando gli hash delle radici dei sotto alberi al posto di esse. La Figura~\ref{fig:pruning} mostra un esempio di MHT potato.
 
-\section{DHT}
-\todo{sezione DHT}
+\section{Distributed Hash Table}
+
+Una Distributed Hash Table (DHT) è un sistema di storage distribuito in grado di memorizzare dati sotto forma di coppie chiave-valore, in modo simile alle \emph{hash table}. Sono costruite su un \emph{keyspace}, ovvero l'insieme di tutte le chiavi, distribuite tra i nodi partecipanti. Se un nodo $n$ memorizza il valore $v$ associato alla chiave $k$, si dice che $n$ è \emph{autorità} per $k$. Molte implementazioni di DHT~\cite{maymounkov2002kademlia, ratnasamy2001scalable, stoica2001chord, zhao2004tapestry} permettono di effettuare un \emph{lookup}, l'operazione che consente di individuare il peer che detiene una certa risorsa, in modo efficiente, con un numero di scambi di messaggi e memoria dei peer sublineare, spesso $O(\log N)$, con $N$ il numero totale dei nodi della DHT.
+
+Una DHT presenta le seguenti proprietà:
+
+\begin{itemize}
+	\item[\cmark] \textbf{Decentralizzazione}: il sistema non ha alcun autorità centrale, ma ogni nodo è in grado di effettuare il lookup di una risorsa;
+	\item[\cmark] \textbf{Scalabilità}: l'overhead di comunicazione e memoria dei peer pari a $O(\log N)$;
+	\item[\cmark] \textbf{Tolleranza ai guasti}: il sistema è sempre disponibile anche se molti nodi si sconnettono o si guastano;
+	\item[\cmark] \textbf{Efficacia}: una risorsa è sempre reperita se presente nel sistema.
+	\item[\xmark] \textbf{Correttezza}: non esiste alcun modo per verificare che il dato ottenuto sia l'ultima versione memorizzata, o sia stata modificata dal peer autorità.
+\end{itemize}
+
+Per garantire la correttezza, si utilizzano le DHT \emph{autenticate}~\cite{tamassia2011efficient, bernardini2019blockchains}, in cui ogni nodo $n$ memorizza anche un'ADS potata, avente come foglie solo quelle per cui $n$ è autorità.
