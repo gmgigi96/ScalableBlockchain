@@ -1,7 +1,56 @@
 \chapter{Una soluzione scalabile}
 
-\section{Architettura}
+\section{Problematiche in approcci correnti}
+
+\section{Aspetti centrali e definizioni di base}
+
+%Vediamo l'architettura proposta, in riferimento alla Figura~\ref{fig:architecture}.
+
+Per i problemi presentati precedentemente, il \textit{blocco} dell'architettura proposta non è come quello delle soluzioni comuni, in cui sono memorizzate le transazioni confermate dai miner. Infatti in quest'ultimo caso la dimensione del blocco dipende dal numero di transazioni confermate e quindi dal carico generato dalla rete. Questo ovviamente è un problema di scalabilità, per cui la dimensione del blocco è costante e contiene solamente l'hash del blocco precedente e l'hash dello stato della blockchain dopo l'applicazione delle transazioni del blocco. Per cui, il blocco può esser visto come l'header del blocco delle soluzioni tradizionali. L'hash dello stato è ottenuto dal root-hash del Merkle Tree dello stato, per cui è chiamato \emph{state root-hash}.
+
+L'intera architettura, per ragioni di scalabilità, è organizzata secondo una \emph{pipeline}, in cui ogni operazione è eseguita in diversi \emph{stage}. Il tempo è inoltre suddiviso in \emph{round}, numerati sequenzialmente. In ogni round ogni nodo può partecipare alla conferma delle nuove transazioni oppure alla creazione del nuovo blocco. L'ultimo stage della pipeline corrisponde alla creazione del nuovo blocco, inviato in broadcast a tutti i nodi della rete.
+
+Le operazioni vengono eseguite da un certo numero di \emph{comitati}, che lavorano insieme per la validazione e conferma delle nuove trasazioni e per la creazione del corrispettivo blocco per ogni round. Ogni comitato è formato da un numero di \emph{membri}, che è costante, come si vedrà in seguito, anche all'aumentare dei nodi sulla rete. \'E importante, per problemi di sicurezza, che i membri di ogni comitato, come nell'approccio sharded (vedi Paragrafo~\ref{sec:sharding}), siano selezionati in modo randomico e cambiati regolarmente, per esempio ad ogni round. Un approccio può essere quello proposto da Algorand~\cite{gilad2017algorand}, utilizzando un approccio basato su VRF~\cite{micali1999verifiable}. I comitati cooperano quindi alla conferma e creazione del nuovo blocco, comunicando mediante un meccanismo di comunicazione \emph{inter-committee}, discusso in seguito.
+Ogni comitato svolge il proprio ruolo durante uno stadio e invia il risultato del lavoro ai membri dei comitati dei successivi round/stadio.
+
+Si denota con $B_i$ il blocco prodotto come output dell'ultimo stadio nel round $i$, mentre con $B^i$ si denota il blocco che contiene le transazioni che entrano nella pipeline nel round $i$. Se la pipeline ha $q$ stadi, le transazioni che entrano nella pipeline al round $i$, e che sono accettate, faranno parte del blocco prodotto dal comitato dell'ultimo stadio al round $i+q-1$. Quindi, $B^i = B_{i+q-1}$. Le transazioni confermate in $B_i$ saranno visibili a tutti i nodi della rete a partire dall'inizio del round $i+q$.
+
+Differentemente da altre sistemi visti nei precedenti paragrafi, l'intero stato della blockchain non viene memorizzato da ogni nodo, non solo per le eccessive dimensioni richieste che aumentano nel tempo, ma anche perché richiede un processamento da parte di ogni nodo proporzionale al carico. Come è stato descritto nel Paragrafo~\ref{sec:bernardini}, un nodo può creare e partecipare alla conferma di un insieme di transazioni anche senza dover memorizzare l'intero stato. Infatti, esso è memorizzato in una DHT, dove ogni nodo, denominato \emph{storage node}, ne memorizza solo una parte, quello per cui è \emph{autorità}. Sulla DHT è costruito un Merkle Tree $W$ \emph{virtuale} sull'intero spazio degli indirizzi, in cui ogni foglia è un indirizzo. Gli storage node memorizzando solo una parte dello stato, ovvero un sottoinsieme degli indirizzi, posseggono solo una parte di $W$, che è potato e ha per foglie gli indirizzi per cui esso è \emph{autorità}.
+
+Come descritto nel Paragrafo~\ref{sec:bernardini}, un nodo $n$ che crea una transazione ha la responsabilità di fornire le prove crittografiche dei conti associati agli indirizzi che sono coinvolti nella transazione e che la stessa modifica. $n$ ottiene le prove crittografiche dagli storage node autorità per gli indirizzi coinvolti nella nuova transazione. Poiché ogni storage node possiede una versione potata del Merkle Tree $W$, può fornire tali prove per gli indirizzi che memorizza. Tuttavia i conti e le rispettive prove sono indietro nel tempo rispetto a quando verranno confermate dagli opportuni comitati. Si dice quindi che una proof $p$ è \emph{relativa} ad uno stato della blockchain ottenuto applicando le transazioni nel blocco $B$, intendendo che è valida rispetto allo state root-hash contenuto nel blocco $B$. In modo più semplice, si può dire che $p$ è relativa a $B$.
+Ogni nodo della rete, memorizza solo gli ultimi $d$ blocchi che ha ricevuto, per cui possiede i blocchi $B_{i-1}=B^{i-q}, \dots, B_{i-d}=B^{i-q-d+1}$. Quindi, una proof $p$ relativa a $B_j$ è considerata \emph{scaduta} al round $i$, se $i > j + d$.
+
+Poiché nel round $i$ l'ultimo blocco disponibile è $B_{i-1}$, uno storage node per ogni indirizzo richiesto, risponde con uno stato ed una proof relativa a $B_{i-1}$. Inoltre, visto che nel modello, senza perdere di generalità, un nodo impiega un round per ottenere tutte le proof relative agli elementi di stato coinvolti in una nuova transazione, affinché i comitati del primo stadio della pipeline possano validare le proof relative ai conti coinvolti nelle transazioni, $d \geq 2$.
+
+\section{Architettura e ruolo dei comitati}
+
+In questo paragrafo è descritta l'architettura e il ruolo di ogni comitato dal momento in cui un nodo crea una transazione, fino alla sua conferma. La Figura~\ref{fig:architecture} mostra l'architettura e il flusso di informazioni scambiate tra i comitati.
+
+Ogni nodo può creare una transazione. Come descritto nel paragrafo precedente, una nuova transazione deve contenere il saldo dei conti associati e le proof di integrità relative, ottenute durante il round precedente dagli storage node autorità per gli elementi di stato coinvolti nella transazione. Le nuove transazioni non sono inviate in broadcast come nelle soluzioni tradizionali, ma sono inviate ad un ristretto numero di nodi.
+
+Il ruolo di validazione e conferma delle nuove transazioni è eseguito dai \emph{Confirmation Committee} (\emph{CC}). Ogni CC è denotato con $C_k$, con $k = 1, \dots, N_c$, dove $N_c$ è il numero di CC. Quando è importante, si denota con $C_k^i$ il $k$-esimo Confirmation Committee relativo al round $i$. Come detto prima, per motivi di sicurezza, ogni Confirmation Committee tra un round e l'altro è formato da membri differenti. Il nodo che crea la transazione $t$, la invia a $C_k^i$ tale che $k = hash(t_s) \mod N_c$, dove $t_s$ è la sorgente della transazione $t$, e si dice che $C_k^i$ è \emph{responsabile} per $t$. Ogni nuova transazione $t$ è ricevuta da $C_k^i$ \emph{prima} del round dell'inizio del round $i$, in modo tale che $C_k^i$ possa processare $t$ durante il round $i$. L'insieme di transazioni per cui $C_k^i$ è responsabile è denotato $P(C_k^i)$. Si denota con $P^i = \cup_k P(C_k^i)$ l'insieme di tutte le transazioni processate da tutti i Confirmation Committee nel round $i$. Il risultato di un $C_k^i$ è una lista di transazioni validate e confermate denotato $A_k^i$, con $A_k^i \subseteq P(C_k^i)$.
+
+$C_k^i$, affinché possa validare correttamente le transazioni, per ogni transazione $t$ ottiene il saldo associato a $B^{i-1}$, in modo da verificare che $t_s$ non diventi negativo applicando la transazione $t$. Poiché le proof fornite in $t$ sono relative a $B_{i-2} = B^{i-q-1}$, esse sono troppo vecchie. Infatti, i conti associati potrebbero essere stati modificati negli ultimi $q$ round, i cui blocchi non sono ancora disponibili (perché la loro creazione è ancora in corso dalla pipeline). Quindi, ogni $C_k^i$ deve conoscere le transazioni confermate, e quindi i cambiamenti allo stato, dai Confirmation Committee dei round precedenti $C_k^{i-q}, \dots, C_k^{i-1}$, ovvero $A_k^{i-q}, \dots, A_k^{i-1}$. Queste transazioni devono essere utilizzate per aggiornare tutti i conti associati alle transazioni in $P(C_k^i)$ per ottenere lo stato di $B^{i-1}$. Questo processo è chiamato \emph{time-updating}.
+
+Ogni $C_k^i$ esegue il seguente algoritmo, tramite un protocollo di consenso:
+
+\begin{enumerate}
+	\item Verifica che ogni transazione in $P(C_k^i)$ rispetti le regole sintattiche e le proof non sono scadute. Non accetta le transazioni che non passano queste verifiche, generando $P'(C_k^i) \subseteq P(C_k^i)$.
+	\item Seleziona una permutazione $\overline{T}$ di $P'(C_k^i)$.
+	\item Sia $\widetilde{T}$ la concatenazione di $A_k^{i-q}, \dots, A_k^{i-1}$. Per ogni sorgente nelle transazioni in $\overline{T}$, considera l'ultimo saldo tra i conti delle transazioni in $\widetilde{T}$ e i conti forniti dalle proof delle transazioni in $\overline{T}$.
+	\item Esegui le transazioni in $\overline{T}$ e verifica che il saldo risultante di ogni transazione non scenda sotto-zero. Le transazioni che non rispettano questa regola sono scartate. Il risultato è la lista $A_k^i$ ottenuto da $\overline{T}$ dove le transazioni scartate sono omesse.	
+\end{enumerate}
+
+Le transazioni in $A_k^i$ si considerano \emph{confermate} e saranno inserite nel blocco $B_i$. Per permettere ai Confirmation Committee dei round successivi di effettuare il time-updating, $C_k^i$ invia $A_k^i$ a $C_k^{i+1}, \dots, C_k^{i+q}$ ed anche ad altri comitati, come mostrato in seguito.
+
+La lista delle transazioni confermate nel round $i$ è denotato $A^i = \cup_k A_k^i$, e rispetta lo stesso ordine delle transazioni in ogni $A_k^i$. Le transazioni in $A_k^i$ sono inviate anche agli storage node, anche se il blocco $B^i$ non è stato ancora creato.
+
+%% riprendere da RPC
+
+
 
 \section{Analisi Multicast}
 
-\section{Teoremi}
+\section{Teorema di correttezza}
+
+\section{Teorema di scalabilità}
