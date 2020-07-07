@@ -147,8 +147,15 @@ L'\emph{eclipse attack} (vedi Figura~\ref{fig:eclipse_attack}) è un attacco per
 \end{itemize}
 
 
-\section{Blockchain Trilemma}
-Sebbene il \emph{blockchain trilemma} influisca sull'analisi e progettazione di tecnologie di blockchain, non è presente una definizione formale in letteratura, anche se è citato in numerosi lavori, come ???\todo{inserire riferimenti a trilemma}. Il termine~\cite{ethfaqsharding} fu coniato da Vitalik Buterin, creatore di \emph{Etherium}, una blockchain basata su Proof-of-work, individuando le tre caratteristiche che una blockchain deve avere per allargare i propri confini a livello globale: \emph{decentralizzazione}, \emph{sicurezza} e \emph{scalabilità}. Il \emph{trilemma} afferma che bisogna rinunciare ad almeno un'alternativa. Il blockchain trilemma si può rappresentare con un triangolo, come in Figura~\ref{img:trilemma},\todo{immagine trilemma} ai cui vertici ci sono le tre proprietà e in cui l'ottimo è il centro.
+\section{Blockchain Scalability Trilemma}
+Sebbene il \emph{blockchain scalability trilemma} influisca sull'analisi e progettazione di tecnologie di blockchain, non è presente una definizione formale in letteratura, anche se è citato in numerosi lavori, come ???\todo{inserire riferimenti a trilemma}. Il termine~\cite{ethfaqsharding} fu coniato da Vitalik Buterin, creatore di \emph{Etherium}, una blockchain basata su Proof-of-work, individuando le tre caratteristiche che una blockchain deve avere per allargare i propri confini a livello globale: \emph{decentralizzazione}, \emph{sicurezza} e \emph{scalabilità}. Il \emph{trilemma} afferma che bisogna rinunciare ad almeno un'alternativa. Il blockchain scalability trilemma si può rappresentare con un triangolo, come in Figura~\ref{fig:trilemma}, ai cui vertici ci sono le tre proprietà e in cui l'ottimo è al centro.
+
+\begin{figure}
+	\centering
+	\includegraphics{img/capuno/trilemma.pdf}
+	\caption{Rappresentazione del blockchain scalability trilemma. Secondo il trilemma una blockchain può trovarsi su uno dei lati del triangolo e non nel centro, rappresentante l'ottimo.}
+	\label{fig:trilemma}
+\end{figure}
 
 Vediamo in dettaglio i tre elementi fondamentali del trilemma.
 
@@ -158,7 +165,7 @@ Per decentralizzazione si intende il fatto che le transazioni siano validate e c
 
 \paragraph{Scalabilità}
 La scalabilità è la proprietà che consente realmente un adozione a livello globale. Essa si riferisce al fatto che un sistema possa adattarsi ad un incremento di carico. Ad esempio, le due tecnologie di blockchain ad oggi più utilizzate, Bitcoin e Ethereum, posso gestire un carico massimo di 7 e 12 TPS\footnote{TPS = transazioni al secondo}
-al contrario di Visa, che può arrivare a 65.000 TPS\todo{citazione pdf visa}. EOS, una blockchain progettata per essere scalabile, ha un troughput dichiarato di circa 2000 TPS, ma promette di poter processare milioni di transazioni in futuro, tuttavia ad un prezzo: la decentralizzazione.\todo{citazione EOS}
+al contrario di Visa, che può arrivare a 65.000 TPS\todo{citazione pdf visa}. EOS~\cite{xu2018eos}, una blockchain progettata per essere scalabile, ha un troughput dichiarato di circa 2000 TPS, ma promette di poter processare milioni di transazioni in futuro, tuttavia ad un prezzo: la decentralizzazione.
 
 \paragraph{Sicurezza}
 La sicurezza deve essere il requisito fondamentale in una blockchain. Se la sicurezza è povera o del tutto assente, un attaccante può spendere più volte la stessa quantità di denaro, \emph{double spending}, arricchendo se stesso a scapito di altri ed arrivare a modificare lo stato della blockchain, che per sua natura è immutabile. Questo può succedere ad esempio nel 51\% attack, presentato nel Paragrafo~\ref{attacks}.
