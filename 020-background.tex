@@ -182,7 +182,15 @@ Una struttura dati autenticata (ADS) è una struttura dati contenente valori che
 
 Supponiamo di trovarci nel seguente scenario. Un client ha bisogno di memorizzare una certa quantità di dati che eccede le sue disponibilità di memorizzazione fisica. Può memorizzare i suoi dati su un server esterno che ha una grande capacità di memorizzazione, come ad esempio un servizio di cloud storage. Il client vuole essere sicuro che la versione dei file che memorizza in cloud sia l'ultima e che nessuno possa modificare il contenuto dei suoi file. Questo problema può essere risolto mediante le strutture dati autenticate, senza che il client memorizzi l'intera struttura dati e senza memorizzare l'hash di ogni singolo file. In quest'ultimo caso infatti dovrebbe memorizzare un numero di hash lineare con il numero di file che ha memorizzato in cloud. Applicazioni del genere sono molto frequenti, anche nel caso di Bitcoin, in cui esistono client \emph{leggeri}, i cosiddetti \emph{thin client}, che memorizzano solo l'header dei blocchi della blockchain, mentre tutte le transazioni contenute nei blocchi sono memorizzati su un server esterno. Una realizzazione di un protocollo efficiente che fa uso di ADS si può trovare in \cite{pennino2019pipeline} e \cite{gdm}.
 
-Un'implementazione efficiente di un'ADS è il Merkle Tree, utilizzato per la realizzazione di dizionari autenticati. Dato un insieme di elementi $V$, il Merkle Tree $T$ è un albero binario completo bilanciato avente come foglie gli hash degli elementi in $V$, mentre i nodi intermedi sono il risultato dell'hash della concatenazione dei nodi figli. Il root di $T$ contiene il \emph{root-hash} di $T$. La Figura~\ref{fig:mht}\todo{inserire figura mht} mostra un esempio di Merkle Tree.
+Un'implementazione efficiente di un'ADS è il Merkle Tree, utilizzato per la realizzazione di dizionari autenticati. Dato un insieme di elementi $V$, il Merkle Tree $T$ è un albero binario completo bilanciato avente come foglie gli hash degli elementi in $V$, mentre i nodi intermedi sono il risultato dell'hash della concatenazione dei nodi figli. Il root di $T$ contiene il \emph{root-hash} di $T$. La Figura~\ref{fig:mht} mostra un esempio di Merkle Tree.
+
+\begin{figure}
+	\centering
+	\includegraphics{img/capuno/mht.pdf}
+	\caption{Un esempio di Merkle Tree.}
+	\label{fig:mht}
+\end{figure}
+
 Come ogni ADS, ad una richiesta \emph{T.get(k)}, dove si richiede il valore $v$ associato alla chiave $k$, si ottiene anche una \emph{proof} associata a $v$. La proof è una struttura dati utile a verificare l'integrità del valore a cui è associata. In particolare, in un Merkle Tree la proof si ottiene dall'Algoritmo~\ref{alg:proof}.
 
 \begin{algorithm}
@@ -210,6 +218,13 @@ Come ogni ADS, ad una richiesta \emph{T.get(k)}, dove si richiede il valore $v$ 
 \end{algorithm}
 
 La Figura~\ref{fig:mht_proof} mostra un esempio di proof, rappresentata con linee tratteggiate per il valore ???. Considerato il cammino $p$ da ??? al root, rappresentato in figura con una linea punteggiata, si selezionano i nodi ???, fratelli dei nodi percorsi in $p$. La proof risultante è quindi la lista di coppie [(???, ???)].
+
+\begin{figure}
+	\centering
+	\includegraphics{img/capuno/proof.pdf}
+	\caption{Proof di ??? in un Merkle Tree. Essa è formata dai nodi tratteggiati.}
+	\label{fig:mht_proof}
+\end{figure}
 
 Un Merkle Tree utilizza uno spazio $O(|V|)$ e una dimensione della proof, un tempo per una query ed un tempo di verifica pari a $O(\log{|V|})$.
 
@@ -239,7 +254,15 @@ La tecnica della \emph{potatura}~\cite{ponnapalli2019scalable}, o \emph{pruning}
 
 \section{Distributed Hash Table}
 
-Una Distributed Hash Table (DHT) è un sistema di storage distribuito in grado di memorizzare dati sotto forma di coppie chiave-valore, in modo simile alle \emph{hash table}. Sono costruite su un \emph{keyspace}, ovvero l'insieme di tutte le chiavi, distribuite tra i nodi partecipanti. Se un nodo $n$ memorizza il valore $v$ associato alla chiave $k$, si dice che $n$ è \emph{autorità} per $k$. Molte implementazioni di DHT~\cite{maymounkov2002kademlia, ratnasamy2001scalable, stoica2001chord, zhao2004tapestry} permettono di effettuare un \emph{lookup}, l'operazione che consente di individuare il peer che detiene una certa risorsa, in modo efficiente, con un numero di scambi di messaggi e memoria dei peer sublineare, spesso $O(\log N)$, con $N$ il numero totale dei nodi della DHT.
+Una Distributed Hash Table (DHT) è un sistema di storage distribuito in grado di memorizzare dati sotto forma di coppie chiave-valore, in modo simile alle \emph{hash table}. Sono costruite su un \emph{keyspace}, ovvero l'insieme di tutte le chiavi, distribuite tra i nodi partecipanti. Se un nodo $n$ memorizza il valore $v$ associato alla chiave $k$, si dice che $n$ è \emph{autorità} per $k$. Molte implementazioni di DHT~\cite{maymounkov2002kademlia, ratnasamy2001scalable, stoica2001chord, zhao2004tapestry} permettono di effettuare un \emph{lookup}, l'operazione che consente di individuare il peer che detiene una certa risorsa, in modo efficiente, con un numero di scambi di messaggi e memoria dei peer sublineare, spesso $O(\log N)$, con $N$ il numero totale dei nodi della DHT (vedi Figura~\ref{fig:kadelia}).
+
+\todo{da rifare}
+\begin{figure}
+	\centering
+	\includegraphics{img/capuno/kademlia.png}
+	\caption{Rappresentazione della tabella di lookup logaritmica con il numero dei nodi in Kademlia.}
+	\label{fig:mht_proof}
+\end{figure}
 
 Una DHT presenta le seguenti proprietà:
 
