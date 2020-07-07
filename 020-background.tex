@@ -17,7 +17,15 @@ Un nodo per partecipare alla rete e scambiare i propri bitcoin, ha bisogno di un
 La possibilità di generate autonomamente delle chiavi evidenza la caratteristica fondamentale di Bitcoin, ovvero quella della decentralizzazione del controllo e del consenso, basate su prove crittografiche.
 In particolare, il modello di riferimento è quello della crittografia a chiave asimmetrica, in cui le chiavi digitali sono sottoforma di una coppia di chiavi, una \emph{privata}, segreta, ed una \emph{pubblica}, che deriva dalla chiave privata. \'E importante specificare che l'uso della crittografia non ha uno scopo di \emph{confidenzialità}, d'altronde tutto in Bitcoin viaggia in chiaro, ma per \emph{autenticità}, per dimostrare quindi chi si dice di essere, ovvero possessori di un certo conto.
 Secondo una relazione matematica, la chiave privata può essere usata per firmare un messaggio, o in questo caso una transazione,  e la chiave pubblica, conosciuta da tutti i nodi della rete, per validare la firma del messaggio. Infatti, semplicisticamente, la chiave pubblica è usata per ricevere i bitcoin, mentre la chiave privata per spenderli, secondo delle modalità che saranno note nel proseguimento della lettura dei prossimi paragrafi, in cui si mostra la creazione di una transazione da parte di un client, e quindi le prove crittografiche che deve mostrare in modo da poter spendere i suoi bitcoin.
-In una transazione, l'indirizzo di destinazione è indicato da un \emph{bitcoin address}, che deriva dalla chiave privata del client, mediante una serie di funzioni hash, come illustrato nella Figura~\ref{img:bit_address}.\todo{inserire immagine di come un indirizzo bitcoin deriva da una chiave pubblica}
+In una transazione, l'indirizzo di destinazione è indicato da un \emph{bitcoin address}, che deriva dalla chiave privata del client, mediante una serie di funzioni hash, come illustrato nella Figura~\ref{img:bit_address}.
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[]{img/capuno/PubKeyToAddr.png}
+	\caption{Creazione di un indirizzo Bitcoin a partire dalla chiave pubblica~\emph{\cite{bitaddress2020}}}
+	\label{img:bit_address}
+\end{figure}
+
 Quando un nodo spende i propri bitcoin, associati al bitcoin address del nodo stesso, presenta la sua chiave pubblica e la firma di una certa stringa che dimostra che effettivamente lui è il proprietario di quella somma. In questo modo, chiunque nella rete, con queste due informazioni, può verificare che il nodo è realmente il proprietario di una certa quantità di bitcoin spesi in una transazione. \'E chiaro che chiunque in possesso della chiave privata di un nodo, può spendere a suo piacimento i bitcoin associati al relativo bitcoin address. Per questo, e anche per anonimizzare i creatori delle transazioni, un wallet genera ad ogni transazione una nuova coppia di chiavi.
 
 Un waller, come si già è detto in precedenza, è un client che memorizza le chiavi digitali di un nodo. Può essere: (1) \emph{non-deterministico} e generare chiavi private in modo totalmente randomico, per cui il waller è un database che memorizza queste chiavi private, e (2) \emph{deterministico} e generare delle chiavi private a partire da un unico \emph{seed}, che può essere anche una password digitata da un utente, per cui non ha bisogno di memorizzare alcuna chiave.
