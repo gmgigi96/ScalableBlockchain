@@ -17,13 +17,13 @@ Un nodo per partecipare alla rete e scambiare i propri bitcoin, ha bisogno di un
 La possibilità di generate autonomamente delle chiavi evidenza la caratteristica fondamentale di Bitcoin, ovvero quella della decentralizzazione del controllo e del consenso, basate su prove crittografiche.
 In particolare, il modello di riferimento è quello della crittografia a chiave asimmetrica, in cui le chiavi digitali sono sottoforma di una coppia di chiavi, una \emph{privata}, segreta, ed una \emph{pubblica}, che deriva dalla chiave privata. \'E importante specificare che l'uso della crittografia non ha uno scopo di \emph{confidenzialità}, d'altronde tutto in Bitcoin viaggia in chiaro, ma per \emph{autenticità}, per dimostrare quindi chi si dice di essere, ovvero possessori di un certo conto.
 Secondo una relazione matematica, la chiave privata può essere usata per firmare un messaggio, o in questo caso una transazione,  e la chiave pubblica, conosciuta da tutti i nodi della rete, per validare la firma del messaggio. Infatti, semplicisticamente, la chiave pubblica è usata per ricevere i bitcoin, mentre la chiave privata per spenderli, secondo delle modalità che saranno note nel proseguimento della lettura dei prossimi paragrafi, in cui si mostra la creazione di una transazione da parte di un client, e quindi le prove crittografiche che deve mostrare in modo da poter spendere i suoi bitcoin.
-In una transazione, l'indirizzo di destinazione è indicato da un \emph{bitcoin address}, che deriva dalla chiave privata del client, mediante una serie di funzioni hash, come illustrato nella Figura~\ref{img:bit_address}.
+In una transazione, l'indirizzo di destinazione è indicato da un \emph{bitcoin address}, che deriva dalla chiave privata del client, mediante una serie di funzioni hash, come illustrato nella Figura~\ref{fig:bit_address}.
 
 \begin{figure}[p]
 	\centering
 	\includegraphics[]{img/capuno/PubKeyToAddr.png}
 	\caption{Creazione di un indirizzo Bitcoin a partire dalla chiave pubblica~\emph{\cite{bitaddress2020}}}
-	\label{img:bit_address}
+	\label{fig:bit_address}
 \end{figure}
 
 Quando un nodo spende i propri bitcoin, associati al bitcoin address del nodo stesso, presenta la sua chiave pubblica e la firma di una certa stringa che dimostra che effettivamente lui è il proprietario di quella somma. In questo modo, chiunque nella rete, con queste due informazioni, può verificare che il nodo è realmente il proprietario di una certa quantità di bitcoin spesi in una transazione. \'E chiaro che chiunque in possesso della chiave privata di un nodo, può spendere a suo piacimento i bitcoin associati al relativo bitcoin address. Per questo, e anche per anonimizzare i creatori delle transazioni, un wallet genera ad ogni transazione una nuova coppia di chiavi.
@@ -34,7 +34,6 @@ Un waller, come si già è detto in precedenza, è un client che memorizza le ch
 \subsection{Transazioni}
 
 Le transazioni ricoprono un ruolo fondamentale in Bitcoin e nelle tecnologie di blockchain in generale. Le transazioni sono delle strutture dati che codificano un trasferimento di bitcoin da una o più sorgenti, denominate \emph{input}, ad una o più destinazioni, denominate \emph{output}. I campi di una transazione sono riportati nella Tabella~\ref{tab:tx_fields}.
-\change{cambiare stile tabella}
 
 Vediamo ora il ciclo di vita di una transazione. Ogni nodo nella rete può generare una transazione. Il nodo durante la creazione può essere online o offline. La transazione contiene una firma che dimostra che il nodo possiede i bitcoin specificati nell'input. La transazione viene quindi inviata in broadcast, raggiungendo tutti i nodi della rete. Questa viene messa nella lista delle transazioni in attesa, \emph{pending transactions}, verificata da ogni nodo, e se è valida, ovvero è conforme alle regole di consenso, viene inclusa all'interno di un blocco insieme ad altre transazioni e aggiunta in coda alla blockchain.
 
@@ -110,7 +109,13 @@ La blockchain è il registro contenente tutte le transazioni accettate, condivis
 
 Un blocco è un contenitore formato da una sezione metadati, composto dalla dimensione del blocco stesso, da un block header di 80 byte e dalla lista di transazioni validate. Il block header è composto dall'hash del precedente blocco, dal \emph{root-hash} del Merkle Tree formato dalle transazioni contenute nel blocco, un \emph{timestamp}, ovvero il tempo di creazione approssimato del blocco, un \emph{difficulty target} e un \emph{nounce}, utilizzati nella fase di mining.
 La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.
-\todo{fare figura blockchain bitcoin}
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[]{img/capuno/blockchain_bitcoin.pdf}
+	\caption{Esempio di blockchain in Bitcoin. Ogni blocco punta al blocco precedente specificandone l'hash dell'header}
+	\label{fig:bitcoin_blockchain}
+\end{figure}
 
 \todo{definire blockchain pubbliche e private nel'introduzione a blockchain}
 
@@ -119,12 +124,9 @@ La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.
 \paragraph{51\% attack}
 Qualsiasi tecnologia di blockchain per sua natura si basa su un meccanismo di consenso distribuito che garantisce una mutua fiducia. Se nelle blockchain basate su Proof-of-work un miner possiede più del 50\% dell'hash power,
 \todo{forse definire hash power}
-può sfruttare l'attacco 51\% per ottenere il 100\% delle ricompense dal mining, poichè riuscirebbe a creare catene di blocchi sicuramente più lunghe di qualsiasi altro miner, per fare un attacco \emph{double spending}, in cui si utilizza più volte lo stesso importo per i pagamenti, eliminare dalla blockchain gli ultimi blocchi confermati ed eventualmente corrompere la blockchain stessa.
+può sfruttare l'attacco 51\% (o \emph{attacco Sybil}~\cite{douceur2002sybil}) per ottenere il 100\% delle ricompense dal mining, poichè riuscirebbe a creare catene di blocchi sicuramente più lunghe di qualsiasi altro miner, per fare un attacco \emph{double spending}, in cui si utilizza più volte lo stesso importo per i pagamenti, eliminare dalla blockchain gli ultimi blocchi confermati ed eventualmente corrompere la blockchain stessa.
 In una tecnologia come Bitcoin che incentiva economicamente i nodi a diventare miner e che ha raggiunto nel tempo un numero di nodi elevato, e quindi un grande hash power, un simile attacco è molto improbabile. Sicuramente non sono escluse da questo attacco le blockchain di piccole dimensioni, che hanno un hash power di gran lunga più piccolo di quello di Bitcoin: esempi di cripto-valute che sono state vittime del 51\% attack sono Monacoin, Bitcoin Gold e ZenCash. \improvement{inserire citazioni agli attacchi}
 In realtà l'avvento delle mining pool in Bitcoin, in cui più miner mettono a disposizione la propria potenza computazionale al servizio di un gruppo di più miner che divide il compenso in modo proporzionale all'hash power condiviso, apre la possibilità ad un'organizzazione del genere ad un 51\% attack se la somma totale dell'hash power di tutti i nodi iscritti supera il 50\% dell'intero hash power della rete. \'E stato il caso di \texttt{ghash.io}, in cui, dopo aver raggiunto nel gennaio del 2014 il 42\% dell'intera potenza computazionale della rete Bitcoin, molti miner si sono disiscritti dal pool e il pool stesso rilasciò una dichiarazione in cui rassicurava la comunità Bitcoin di evitare di raggiungere la soglia del 51\%~\cite{51-attack}.
-
-\paragraph{Sybil attack}
-\todo{fare sybil attack}
 
 \paragraph{Eclipse attack}
 L'eclipse attack è un attacco perpetrato ai danni di una singola vittima. Un attaccante, che controlla un gran numero di nodi, ad esempio una botnet, può isolare un nodo del resto della blockchain. Questo gli consente di mostrare una blockchain differente da quella che è in realtà e di sfruttare la potenza computazionale della vittima per i suoi comportamenti malevoli. Heilman et al.~\cite{heilman2015eclipse}, mostrano che è possibile utilizzare un attacco eclipse come base per altri attacchi:
