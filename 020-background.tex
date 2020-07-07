@@ -110,7 +110,7 @@ La blockchain è il registro contenente tutte le transazioni accettate, condivis
 Un blocco è un contenitore formato da una sezione metadati, composto dalla dimensione del blocco stesso, da un block header di 80 byte e dalla lista di transazioni validate. Il block header è composto dall'hash del precedente blocco, dal \emph{root-hash} del Merkle Tree formato dalle transazioni contenute nel blocco, un \emph{timestamp}, ovvero il tempo di creazione approssimato del blocco, un \emph{difficulty target} e un \emph{nounce}, utilizzati nella fase di mining.
 La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.
 
-\begin{figure}[p]
+\begin{figure}
 	\centering
 	\includegraphics[]{img/capuno/blockchain_bitcoin.pdf}
 	\caption{Esempio di blockchain in Bitcoin. Ogni blocco punta al blocco precedente specificandone l'hash dell'header}
@@ -129,8 +129,14 @@ In una tecnologia come Bitcoin che incentiva economicamente i nodi a diventare m
 In realtà l'avvento delle mining pool in Bitcoin, in cui più miner mettono a disposizione la propria potenza computazionale al servizio di un gruppo di più miner che divide il compenso in modo proporzionale all'hash power condiviso, apre la possibilità ad un'organizzazione del genere ad un 51\% attack se la somma totale dell'hash power di tutti i nodi iscritti supera il 50\% dell'intero hash power della rete. \'E stato il caso di \texttt{ghash.io}, in cui, dopo aver raggiunto nel gennaio del 2014 il 42\% dell'intera potenza computazionale della rete Bitcoin, molti miner si sono disiscritti dal pool e il pool stesso rilasciò una dichiarazione in cui rassicurava la comunità Bitcoin di evitare di raggiungere la soglia del 51\%~\cite{51-attack}.
 
 \paragraph{Eclipse attack}
-L'eclipse attack è un attacco perpetrato ai danni di una singola vittima. Un attaccante, che controlla un gran numero di nodi, ad esempio una botnet, può isolare un nodo del resto della blockchain. Questo gli consente di mostrare una blockchain differente da quella che è in realtà e di sfruttare la potenza computazionale della vittima per i suoi comportamenti malevoli. Heilman et al.~\cite{heilman2015eclipse}, mostrano che è possibile utilizzare un attacco eclipse come base per altri attacchi:
-\todo{immagine eclipse attack - tipo http://cs-people.bu.edu/heilman/eclipse/eclipseicon1.png}
+L'\emph{eclipse attack} (vedi Figura~\ref{fig:eclipse_attack}) è un attacco perpetrato ai danni di una singola vittima. Un attaccante, che controlla un gran numero di nodi, ad esempio una botnet, può isolare un nodo del resto della blockchain. Questo gli consente di mostrare una blockchain differente da quella che è in realtà e di sfruttare la potenza computazionale della vittima per i suoi comportamenti malevoli. Heilman et al.~\cite{heilman2015eclipse}, mostrano che è possibile utilizzare un attacco eclipse come base per altri attacchi:
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.3]{img/capuno/eclipse_attack.png}
+	\caption{Rappresentazione di un attacco eclipse in cui un nodo è isolato dal resto della rete. \emph{Fonte~\cite{heilman2015eclipse}}}
+	\label{fig:eclipse_attack}
+\end{figure}
 
 \begin{itemize}
 	\item \textbf{Engineering block races}: Quando due miner riescono a minare un blocco nello stesso momento, solo uno entra a far parte della blockchain, mentre l'altro diventa un blocco \emph{orfano}, e il miner che ha minato questo blocco non riceve alcuna ricompensa. Un attaccante che eclissa più di un miner, accumula i blocchi scoperti dai miner attaccati, per poi rilasciarli alla rete solo quando un miner non attaccato scopre un blocco. In questo modo i blocchi minati dalle vittime diventano orfani, e come risultato sia ha uno spreco delle risorse degli attaccati.
