@@ -128,7 +128,14 @@ Per diminuire l'impatto di attacchi del tipo \emph{join-leave}, in cui un utente
 
 \paragraph*{Comunicazione cross-shard}
 Lo sharding permette di ridurre lo spazio richiesto dalla blockchain, ma allo stesso tempo aumenta la difficoltà della verifica delle transazioni, perché gli input e gli output possono risiedere su shard differenti. Sia $t$ la transazione generata da un utente. $t$ ha un numero $N$ di input $I_1, \dots, I_N$ e un output $O$. Senza perdità di generalità, si può considerare che ad ogni input corrisponda un unico shard.\todo{da rivedere la frase, forse non si capisce bene} Quindi, si denotano gli shard di input ed output con $C_{in}^j$, tale che $j \in \{1, \dots, N\}$, e con $C_{out}$, rispettivamente. 
-In OmniLedger, per processare ogni transazione $t$ in modo atomico tra shard, si utilizza un protocollo denominato \emph{Byzantine Shard Atomic Commit}, al cui termine $t$ è o confermata o abortita. Il protocollo è formato da 3 step:\todo{inserire immagine protocollo atomix}
+In OmniLedger, per processare ogni transazione $t$ in modo atomico tra shard, si utilizza un protocollo denominato \emph{Byzantine Shard Atomic Commit}, al cui termine $t$ è o confermata o abortita. Il protocollo è formato da 3 step (vedi Figura~\ref{fig:atomix}):
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.9]{img/capdue/atomix.pdf}
+	\caption{Processamento di una transazione cross-shard in Omniledger. \emph{Fonte~\cite{kokoris2018omniledger}}}
+	\label{fig:atomix}
+\end{figure}
 
 \begin{enumerate}
 	\item \textbf{Inizializzazione}: il client $c$ invia $t$ a tutte i $C_{in}^j$ per ogni input $j$ $I_j$ in $t$.
