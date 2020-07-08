@@ -64,7 +64,15 @@ In uno scenario reale, a causa del ritardo di propagazione dei messaggi su rete,
 Durante la creazione di una transazione da parte di un nodo $N_c$ della rete, è responsabilità di $N_c$ fornire tutti i dati necessari affinché la transazione possa essere validata. Una transazione coinvolge degli elementi di stato, il cui insieme è denominato $E$. Per ogni $e \in E$, $N_c$ effettua una query alla DHT, ottenendo dal nodo $N_a$ autorità di $e$ la tupla $\delta_i(e) = \langle v, p, i \rangle$, dove $v$ è il valore associato ad $e$, $p$ la proof associata ad $e$ ottenuta dalla pADS di $N_a$ e $i$ l'indice del blocco pivot di $N_a$.
 
 \paragraph*{Ruolo di validazione}
-Un nodo con il ruolo di validazione valida le nuove transazioni e genera il prossimo blocco da inserire in blockchain. Le transazioni generate con riferimento al paragrafo precedente, vengono ricevute e memorizzate in un pool di transazioni in attesa. Ogni nodo memorizza solamente gli ultimi $d + f$ blocchi che riceve (vedi Figura~\ref{fig:blockchain_bern})\todo{inserire figura blockchain troncata}, formando una \emph{blockchain troncata} $\Lambda_N$. A causa dei ritardi di propagazione, $\Lambda_N$ è in generale diversa per i nodi della rete, ma si suppone che ogni fork sia al massimo lungo $f$, per cui i blocchi a profondità maggiore di $f$ non vengono sicuramente eliminati durante una fork resolution.\todo{forse definire fork resolution quando si parla della fork nel capitolo 1}
+Un nodo con il ruolo di validazione valida le nuove transazioni e genera il prossimo blocco da inserire in blockchain. Le transazioni generate con riferimento al paragrafo precedente, vengono ricevute e memorizzate in un pool di transazioni in attesa. Ogni nodo memorizza solamente gli ultimi $d + f$ blocchi che riceve (vedi Figura~\ref{fig:blockchain_bern}), formando una \emph{blockchain troncata} $\Lambda_N$. A causa dei ritardi di propagazione, $\Lambda_N$ è in generale diversa per i nodi della rete, ma si suppone che ogni fork sia al massimo lungo $f$, per cui i blocchi a profondità maggiore di $f$ non vengono sicuramente eliminati durante una fork resolution.\todo{forse definire fork resolution quando si parla della fork nel capitolo 1}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.7]{img/capdue/truncated_blockchain.pdf}
+	\caption{Blockchain troncata: un nodo memorizza solo gli ultimi $d+f$ blocchi. \emph{Fonte~\cite{bernardini2019blockchains}}}
+	\label{fig:blockchain_bern}
+\end{figure}
+
 In questo caso si sceglie come blocco pivot $b_{l-f}$, dove $l$ è l'indice dell'ultimo blocco in $\Lambda_N$. Ogni blocco $b_i \in \Lambda_N$ oltre a contenere le transazioni confermate, in una struttura dati autenticata come le altre blockchain (ad esempio Bitcoin), include anche il pADS $\tau_i$, che rappresenta lo stato prima dell'applicazione delle transazioni in $b_i$, che coinvolge solo gli elementi di stato $E_i$ modificati dalle transazioni in $b_i$, il resto è potato, come rappresentato in Figura~\ref{fig:block_content}. Si denota inoltre $\pi_i$ il pADS ottenuto da $\tau_i$ applicando le transazioni in $b_i$: $\pi_i$ non necessita di essere memorizzato e può essere calcolato \emph{al volo} quando è necessario.
 
 \begin{figure}
