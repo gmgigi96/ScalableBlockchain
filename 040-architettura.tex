@@ -22,6 +22,8 @@ Ogni nodo della rete, memorizza solo gli ultimi $d$ blocchi che ha ricevuto, per
 
 Poiché nel round $i$ l'ultimo blocco disponibile è $B_{i-1}$, uno storage node per ogni indirizzo richiesto, risponde con uno stato ed una proof relativa a $B_{i-1}$. Inoltre, visto che nel modello, senza perdere di generalità, un nodo impiega un round per ottenere tutte le proof relative agli elementi di stato coinvolti in una nuova transazione, affinché i comitati del primo stadio della pipeline possano validare le proof relative ai conti coinvolti nelle transazioni, $d \geq 2$.
 
+\todo{definizione well-provisioned}
+
 \section{Architettura e ruolo dei comitati}\label{sec:architettura}
 
 In questo paragrafo è descritta l'architettura e il ruolo di ogni comitato dal momento in cui un nodo crea una transazione, fino alla sua conferma. La Figura~\ref{fig:architecture} mostra l'architettura e il flusso di informazioni scambiate tra i comitati.
@@ -37,9 +39,9 @@ Ogni $C_k^i$ esegue il seguente algoritmo, tramite un protocollo di consenso:
 \paragraph*{Algoritmo 1 (Comportamento dei Confirmation Committee)}\todo{cambiare stile scrittura}
 \begin{enumerate}
 	\item Verifica che ogni transazione in $P(C_k^i)$ rispetti le regole sintattiche e le proof non sono scadute. Non accetta le transazioni che non passano queste verifiche, generando $P'(C_k^i) \subseteq P(C_k^i)$.
-	\item Seleziona una permutazione $\overline{T}$ di $P'(C_k^i)$.
-	\item Sia $\widetilde{T}$ la concatenazione di $A_k^{i-q}, \dots, A_k^{i-1}$. Per ogni sorgente nelle transazioni in $\overline{T}$, considera l'ultimo saldo tra i conti delle transazioni in $\widetilde{T}$ e i conti forniti dalle proof delle transazioni in $\overline{T}$.
-	\item Esegui le transazioni in $\overline{T}$ e verifica che il saldo risultante di ogni transazione non scenda sotto-zero. Le transazioni che non rispettano questa regola sono scartate. Il risultato è la lista $A_k^i$ ottenuto da $\overline{T}$ dove le transazioni scartate sono omesse.	
+	\item Seleziona una permutazione $\bar{T}$ di $P'(C_k^i)$.
+	\item Sia $\widetilde{T}$ la concatenazione di $A_k^{i-q}, \dots, A_k^{i-1}$. Per ogni sorgente nelle transazioni in $\bar{T}$, considera l'ultimo saldo tra i conti delle transazioni in $\widetilde{T}$ e i conti forniti dalle proof delle transazioni in $\bar{T}$.
+	\item Esegui le transazioni in $\bar{T}$ e verifica che il saldo risultante di ogni transazione non scenda sotto-zero. Le transazioni che non rispettano questa regola sono scartate. Il risultato è la lista $A_k^i$ ottenuto da $\bar{T}$ dove le transazioni scartate sono omesse.	
 \end{enumerate}
 
 Le transazioni in $A_k^i$ si considerano \emph{confermate} e saranno inserite nel blocco $B_i$. Per permettere ai Confirmation Committee dei round successivi di effettuare il time-updating, $C_k^i$ invia $A_k^i$ a $C_k^{i+1}, \dots, C_k^{i+q}$ ed anche ad altri comitati, come mostrato in seguito.
@@ -95,3 +97,39 @@ Riguardo l'affermazione 3, si noti che gli RPC calcolano il root-hash della vers
 
 
 \section{Teorema di scalabilità}
+
+In questo paragrafo, si dimostra formalmente la scalabilità dell'architettura. Si assume, per semplicità, che i saldi modificati durante un round siano uniformemente distribuiti sullo spazio degli indirizzi.
+Sia $f$ la frequenza delle transazioni che arrivano alla blockchain. Sia $\Delta$ la durata di un round. Sia $m = 2 f \Delta$ il numero di indirizzi il cui saldo viene modificato in un round, assumendo che le transazioni coinvolgano indirizzi distinti. Sia $\widetilde{W}$ la versione di $W$ potata che ha solo $m$ foglie, quelle il cui saldo è modificato in un round. Esiste un livello $l$ di $\widetilde{W}$ al disopra del quale $\widetilde{W}$ è un albero binario completo. Più $m$ è grande, più la parte potata diventa più piccola ed $l$ si avvicina alle foglie.
+
+Sia $j$ il massimo numero di hash che un RPC può calcolare in un round. Si noti che $j$ è constante, poiché dipende dalla capacità computazionale dei nodi di un comitato. Sia $e$ il massimo numero di indirizzi il cui saldo viene modificato che un RPC foglia $R$ sia in grado di processare in un round. Ovviamente $e$ dipende da $j$ e come sono distribuiti gli indirizzi nello spazio degli indirizzi di cui $R$ è autorità. Tuttavia, per ipotesi gli indirizzi modificati sono uniformemente distribuiti, per cui $e$ è uguale per tutti gli RPC foglia. Si assume che $j$ sia grande abbastanza in modo che la radice dell'albero sottostante ad un RPC foglia sia sopra il livello $l$. Quindi, l'albero sottostante $U$ di un RPC interno $R$ è binario e completo. Sia $k$ l'altezza di $U$. Il numero di nodi di $U$ è $2^k-1$. Gli RPC figli di R sono $2^{k-1}$. In ogni round, ogni RPC deve calcolare un hash per ogni nodo del proprio albero sottostante $U$. Il massimo numero di nodi in un albero sottostante ad un RPC interno è $\hat{j} = 2^{\hat{k}-1}$, dove $\hat{k}$ è il più grande numero intero tale che $\hat{j} \leq j$, o in maniera equivalente $\hat{k} = \floor*{\log_2 (j+1)}$. L'altezza massima di un di un albero sottostante ad un RPC è $\hat{k}$.
+
+Sia $S(N, f)$ un sistema di blockchain, avente un'architettura descritta nel Paragrafo~\ref{sec:architettura}, con $N$ nodi ed un carico di frequenza $f$.
+
+\begin{lemma}\label{lemma:rpc_count}
+Sia $S(N, f)$ una blockchain, di $N$ nodi con un carico di frequenza $f$. Sia $e$ il massimo numero di indirizzi il cui saldo è stato modificato che un RPC foglia può processare in un round, e $\hat{j}$ il massimo numero di hash che un RPC interno può calcolare in un round. Se $S$ è ben dimensionato, il numero di RPC foglie è almeno $2^{\ceil*{\log_2 (m/e)}}$ ed il numero di RPC interni è almeno $\ceil*{\frac{2^{\ceil*{\log_2 (m/e)} - 1}}{\hat{j}}}$, in cui $m = 2 f \Delta$ e $\Delta$ è la durata di un round.
+\end{lemma}
+
+\begin{proof}
+Gli RPC foglie sono almeno $\ceil*{m/e}$ e poiché sono le foglie di un albero completo, il loro numero è una potenza di 2. Quindi devono essere $2^g$ con $g = \ceil*{\log_e (m/e)}$.
+
+Quando $m$ aumenta, il numero di risorse usate in ogni RPC foglia aumenta. Quando le risorse di un RPC foglia sono sature, il loro numero raddoppia. Immediatamente dopo un raddoppio, le loro risorse sono utilizzate a metà. Aumentando $m$, le risorse utilizzate vanno da $m$ alla massima capacità computazionale, che si ha subito prima di un raddoppio.
+
+Si consideri l'albero composto dagli RPC interni $W_I$, la sua altezza è $g$. Poiché gli RPC foglia sono $2^g$, i nodi di $W_I$ sono $2^g -1$. Quindi il numero di RPC interni è $\ceil*{\frac{2^g-1}{\hat{j}}}$.
+Da notare che sia il numeratore che il denominatore rappresentano la dimensione di un albero binario completo, con altezza $g$ e $\hat{k}$, rispettivamente. La parte intera del risultato della divisione rappresenta il numero di RPC interni con una dimensione dell'albero sottostante pari a $\hat{j}$. Il resto  è la dimensione della radice dell'albero degli RPC che è in generale sottodimensionato, rispetto alla sua potenza computazionale.
+\end{proof}
+
+
+\begin{theorem}{(Scalabilità).}
+Sia $S(N, f)$ una blockchain well-provisioned composta da $N$ nodi ed un carico di frequenza $f$. Per ogni $\alpha > 1$ tale che $a N$ è intero, la blockchain $\bar{S}(\alpha N, \alpha f)$ è well-provisioned, supponendo un carico uniformemente distribuito sullo spazio degli indirizzi.
+\end{theorem}
+
+\begin{proof}
+Sia $S(N, f)$ un sistema well-provisioned immediatamente dopo un raddoppio, ovvero con gli RPC foglie al minimo delle risorse computazionali utilizzate. In $S$ e in $\bar{S}$ i comitati hanno la stessa potenza computazionale. Si vuole mostrare che $\alpha N$ nodi sono sufficienti per formare dei comitati in grado di processare in carico $\alpha f$.
+
+Un carico di frequenza $f$, genera un numero di transazioni $f \Delta$ per round. Sia $N_C$ il numero di Confirmation Committee in $S$. Poiché, per ipotesi, $S$ è well-provisioned, ogni CC è in grado di processare $f \Delta / N_C$ transazioni per round. In $\bar{S}$ il carico è $\alpha f$, quindi, con $\alpha N_C$ CC, si ha che ogni CC in $\bar{S}$ processa lo stesso numero di transazioni che in $S$.
+
+Si utilizzano i simboli $m$, $e$, $\hat{j}$ e $g$ con lo stesso significato di prima.
+Subito dopo un raddoppio, $m/e$ è una potenza di 2, $g= \log_2 (m/e) +1$, per il Lemma~\ref{lemma:rpc_count} il numero di RPC in $S$ è $N_R = 2^g + \ceil*{2^g/\hat{j}} = 2m/e + \ceil*{2 m/ (e \hat{j}}$. Si considera ora il numero di RPC $\bar{N_R}$ necessari in $\bar{S}(\alpha N, \alpha f)$. Per $\alpha = 2^t$ con $t$ positivo ed intero, $\bar{N_R} = 2 \alpha m / e + \ceil*{2 \alpha m / (e \hat{j})}$. Poiché $\ceil{2 \alpha m/(e \hat{j}} \leq \alpha \ceil*{2 m / (e \hat{j}}$, $N_R \leq \alpha N_R$.
+
+Quindi, l'incremento richiesto da $\bar{S}$ a partire da $S$ del numero di CC ed RPC è al massimo di un fattore $\alpha$ e $\bar{S}$ ha $\alpha N$ nodi. Quindi $\bar{S}$ è well-provisioned.
+\end{proof}

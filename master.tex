@@ -17,6 +17,8 @@
 \usepackage[noend]{algpseudocode}
 \usepackage{booktabs}
 \usepackage{amsthm}
+\usepackage{cases}
+\usepackage{mathtools}
 
 \usepackage{pifont}% http://ctan.org/pkg/pifont
 \newcommand{\cmark}{\ding{51}}%
@@ -35,9 +37,10 @@
 \setcounter{tocdepth}{1}
 \setcounter{secnumdepth}{3}
 
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
 
-
-\newtheorem{theorem}{Teorema}[section]
+\newtheorem{theorem}{Teorema}
 \newtheorem{lemma}{Lemma}
 
 \renewcommand{\thetheorem}{\arabic{theorem}}
