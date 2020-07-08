@@ -22,7 +22,7 @@ Ogni nodo della rete, memorizza solo gli ultimi $d$ blocchi che ha ricevuto, per
 
 Poiché nel round $i$ l'ultimo blocco disponibile è $B_{i-1}$, uno storage node per ogni indirizzo richiesto, risponde con uno stato ed una proof relativa a $B_{i-1}$. Inoltre, visto che nel modello, senza perdere di generalità, un nodo impiega un round per ottenere tutte le proof relative agli elementi di stato coinvolti in una nuova transazione, affinché i comitati del primo stadio della pipeline possano validare le proof relative ai conti coinvolti nelle transazioni, $d \geq 2$.
 
-\section{Architettura e ruolo dei comitati}
+\section{Architettura e ruolo dei comitati}\label{sec:architettura}
 
 In questo paragrafo è descritta l'architettura e il ruolo di ogni comitato dal momento in cui un nodo crea una transazione, fino alla sua conferma. La Figura~\ref{fig:architecture} mostra l'architettura e il flusso di informazioni scambiate tra i comitati.
 
@@ -34,6 +34,7 @@ $C_k^i$, affinché possa validare correttamente le transazioni, per ogni transaz
 
 Ogni $C_k^i$ esegue il seguente algoritmo, tramite un protocollo di consenso:
 
+\paragraph*{Algoritmo 1 (Comportamento dei Confirmation Committee)}\todo{cambiare stile scrittura}
 \begin{enumerate}
 	\item Verifica che ogni transazione in $P(C_k^i)$ rispetti le regole sintattiche e le proof non sono scadute. Non accetta le transazioni che non passano queste verifiche, generando $P'(C_k^i) \subseteq P(C_k^i)$.
 	\item Seleziona una permutazione $\overline{T}$ di $P'(C_k^i)$.
@@ -58,5 +59,39 @@ Ogni storage node $n$ che memorizza la potatura di $W$, le cui foglie sono gli i
 \section{Analisi Multicast}
 
 \section{Teorema di correttezza}
+
+In questo paragrafo si dimostra formalmente la correttezza dell'architettura riportata nel Paragrafo~\ref{sec:architettura}.
+
+\begin{lemma}{(Correttezza dell'algoritmo di conferma).}\label{lemma:cc}
+L'Algoritmo 1 non restituisce mai una sequenza le cui transazioni comportano una violazione del vincolo del saldo non-negativo.
+\end{lemma}
+
+\todo{definire vincolo del saldo non-negativo}
+
+\begin{proof}
+Per costruzione dello step 4 dell'Algoritmo 1.
+\end{proof}
+
+
+\begin{theorem}{(Correttezza).}
+Sia $P^i$ un insieme di transazioni processate, nel round $i$, dai Confirmation Commitee $C_k^i$ e sia $A_k^i$ la lista delle transazioni confermate da ogni $C_k^i$. Le seguenti affermazioni sono vere.
+
+\begin{enumerate}
+	\item In ogni lista $A^i = \cup_k A_k^i$ tale che $A^i$ preserva l'ordine delle transazioni contenute in ogni $A_k^i$, la regola del saldo non-negativo è rispettata.
+	\item Lo state root-hash di $B^i = B_{i+q-1}$ è il root-hash del nuovo stato ottenuto dopo l'applicazione delle transazioni in $A^i$.
+	\item Gli storage node conoscono le proof degli indirizzi per cui sono autorità.
+\end{enumerate}
+
+\end{theorem}
+
+
+\begin{proof}
+Riguardo l'affermazione 1, per il Lemma~\ref{lemma:cc}, $A_k^i$ soddisfa il vincolo del saldo non-negativo e per ipotesi l'ordine delle transazioni in $A^i$ è preservato. Poiché per ogni $k$ gli indirizzi modificati in $A_k^i$ non sono modificati in nessun $A_j^i$ con $j \neq k$, segue l'affermazione.
+
+Riguardo l'affermazione 2, si noti che ogni RPC foglia $R_m^{i+1}$ considera tutte le transazioni in $S_m(A^{i-1}), \dots, S_m(A^{i-1})$, che riguardano gli indirizzi per cui $R_m^{i+1}$ è responsabile, rispettando il loro ordine. Ogni $R_m^{i+1}$ può calcolare correttamente il proprio sub root-hash e passarlo al proprio RPC genitore. Infatti, se un nodo interno nell'albero sotteso è coinvolto in una transazione, $R_m^{i+1}$ riceve le proof della transazione stessa. Se un nodo interno dell'albero sotteso non è coinvolto in alcuna transazione o è potato o è la radice di un sottoalbero potato. Nel primo caso, $R_m^{i+1}$ non ne ha bisogno. Nel secondo, $R_m^{i+1}$ riceve l'hash da una delle proof presenti in $S_m(A^{i-1}), \dots, S_m(A^{i-1})$. Infine, ogni RPC interno, riceve dai propri RPC figli, gli hash delle foglie dei proprio albero sotteso, per cui il calcolo del sub root-hash è banale. Segue quindi l'affermazione.
+
+Riguardo l'affermazione 3, si noti che gli RPC calcolano il root-hash della versione potata $W'$ di $W$, in cui le foglie di $W'$ sono tutti gli indirizzi $U$. Ogni storage node $n$ memorizza una versione potata $W_n$ di $W$, in cui le foglie di $W_n$ sono tutti gli indirizzi $U_n$ che $n$ memorizza. Poiché $U_n \subseteq U$, anche $W_n \subseteq W'$. Quindi, tutti i sub root-hash dei sottoalberi potati di $W_n$ sono conosciuti da uno degli RPC, il qualche può inviarlo ad $n$.
+\end{proof}
+
 
 \section{Teorema di scalabilità}

@@ -12,10 +12,11 @@
 \usepackage{natbib}
 \usepackage[nottoc,notlot,notlof]{tocbibind}
 \usepackage[plainpages=false]{hyperref}
-\usepackage{amsmath}
 \usepackage[chapter]{algorithm}
+\usepackage{amsmath}
 \usepackage[noend]{algpseudocode}
 \usepackage{booktabs}
+\usepackage{amsthm}
 
 \usepackage{pifont}% http://ctan.org/pkg/pifont
 \newcommand{\cmark}{\ding{51}}%
@@ -34,12 +35,16 @@
 \setcounter{tocdepth}{1}
 \setcounter{secnumdepth}{3}
 
-\newlist{Properties}{enumerate}{1}
-\setlist[Properties]{label=\textbf{Proprietà \arabic*.},itemindent=* }
-\algnewcommand{\LeftComment}[1]{\Statex \(\triangleright\) #1}
+
+
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}{Lemma}
+
+\renewcommand{\thetheorem}{\arabic{theorem}}
+
 
 \makeatletter
-\def\BState{\State\hskip-\ALG@thistlm}
+%\def\BState{\State\hskip-\ALG@thistlm}
 \makeatother
 
 \begin{document}
