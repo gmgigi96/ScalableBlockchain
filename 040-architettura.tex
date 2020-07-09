@@ -45,11 +45,13 @@ Ogni nodo della rete, memorizza solo gli ultimi $d$ blocchi che ha ricevuto, per
 
 Poiché nel round $i$ l'ultimo blocco disponibile è $B_{i-1}$, uno storage node per ogni indirizzo richiesto, risponde con uno stato ed una proof relativa a $B_{i-1}$. Inoltre, visto che nel modello, senza perdere di generalità, un nodo impiega un round per ottenere tutte le proof relative agli elementi di stato coinvolti in una nuova transazione, affinché i comitati del primo stadio della pipeline possano validare le proof relative ai conti coinvolti nelle transazioni, $d \geq 2$.
 
+Infine si assume che non ci siano problemi di rete, per cui ogni nodo riceve tutti i messaggi inviati da un nodo sorgente.
+
 \section{Architettura e ruolo dei comitati}\label{sec:architettura}
 
 In questo paragrafo è descritta l'architettura e il ruolo di ogni comitato dal momento in cui un nodo crea una transazione, fino alla sua conferma. La Figura~\ref{fig:architecture} mostra l'architettura e il flusso di informazioni scambiate tra i comitati.
 
-Ogni nodo può creare una transazione. Come descritto nel paragrafo precedente, una nuova transazione deve contenere il saldo dei conti associati e le proof di integrità relative, ottenute durante il round precedente dagli storage node autorità per gli elementi di stato coinvolti nella transazione. Le nuove transazioni non sono inviate in broadcast come nelle soluzioni tradizionali, ma sono inviate ad un ristretto numero di nodi.
+Ogni nodo può creare una transazione. Come descritto nel paragrafo precedente, una nuova transazione deve contenere il saldo dei conti associati e le proof di integrità relative, ottenute durante il round precedente dagli storage node autorità per gli elementi di stato coinvolti nella transazione. Le nuove transazioni (candidate) non sono inviate in broadcast come nelle soluzioni tradizionali, ma ad un ristretto numero di nodi.
 
 Il ruolo di validazione e conferma delle nuove transazioni è eseguito dai \emph{Confirmation Committee} (\emph{CC}). Ogni CC è denotato con $C_k$, con $k = 1, \dots, N_c$, dove $N_c$ è il numero di CC. Quando è importante, si denota con $C_k^i$ il $k$-esimo Confirmation Committee relativo al round $i$. Come detto prima, per motivi di sicurezza, ogni Confirmation Committee tra un round e l'altro è formato da membri differenti. Il nodo che crea la transazione $t$, la invia a $C_k^i$ tale che $k = hash(t_s) \mod N_c$, dove $t_s$ è la sorgente della transazione $t$, e si dice che $C_k^i$ è \emph{responsabile} per $t$. Ogni nuova transazione $t$ è ricevuta da $C_k^i$ \emph{prima} del round dell'inizio del round $i$, in modo tale che $C_k^i$ possa processare $t$ durante il round $i$. L'insieme di transazioni per cui $C_k^i$ è responsabile è denotato $P(C_k^i)$. Si denota con $P^i = \cup_k P(C_k^i)$ l'insieme di tutte le transazioni processate da tutti i Confirmation Committee nel round $i$. Il risultato di un $C_k^i$ è una lista di transazioni validate e confermate denotato $A_k^i$, con $A_k^i \subseteq P(C_k^i)$.
 
@@ -77,9 +79,6 @@ Il generico RPC foglia del round $i+1$ ed autorità dell'$m$-esima porzione dell
 Mentre gli RPC foglie hanno bisogno di uno stato per poter effettuare il time-shifting, gli RPC interni sono stateless. Essendo l'albero sottostante completo, hanno bisogno solamente dei sub root-hash calcolati dagli RPC figli nell'albero degli RPC, che corrispondono agli hash delle foglie dell'albero sottostante dell'RPC interno.
 
 Ogni storage node $n$ che memorizza la potatura di $W$, le cui foglie sono gli indirizzi per cui $n$ è autorità, non può calcolarsi direttamente gli hash dei sottoalberi potati. Quindi, durante il calcolo di $W$ relativo al blocco $B^i$, gli RPC inviano questi hash ai nodi che ne hanno bisogno. Questo può essere realizzato in maniera del tutto trasparente agli RPC, creando un canale \textit{publish/subscribe}~\cite{eugster2003many}, a cui gli storage node interessati per un sottoinsieme di nodi potati si iscrivono.
-
-
-\section{Analisi Multicast}
 
 \section{Teorema di correttezza}
 
@@ -120,7 +119,7 @@ Riguardo l'affermazione 3, si noti che gli RPC calcolano il root-hash della vers
 In questo paragrafo, si dimostra formalmente la scalabilità dell'architettura. Si assume, per semplicità, che i saldi modificati durante un round siano uniformemente distribuiti sullo spazio degli indirizzi.
 Sia $f$ la frequenza delle transazioni che arrivano alla blockchain. Sia $\Delta$ la durata di un round. Sia $m = 2 f \Delta$ il numero di indirizzi il cui saldo viene modificato in un round, assumendo che le transazioni coinvolgano indirizzi distinti. Sia $\widetilde{W}$ la versione di $W$ potata che ha solo $m$ foglie, quelle il cui saldo è modificato in un round. Esiste un livello $l$ di $\widetilde{W}$ al disopra del quale $\widetilde{W}$ è un albero binario completo. Più $m$ è grande, più la parte potata diventa più piccola ed $l$ si avvicina alle foglie.
 
-Sia $j$ il massimo numero di hash che un RPC può calcolare in un round. Si noti che $j$ è constante, poiché dipende dalla capacità computazionale dei nodi di un comitato. Sia $e$ il massimo numero di indirizzi il cui saldo viene modificato che un RPC foglia $R$ sia in grado di processare in un round. Ovviamente $e$ dipende da $j$ e come sono distribuiti gli indirizzi nello spazio degli indirizzi di cui $R$ è autorità. Tuttavia, per ipotesi gli indirizzi modificati sono uniformemente distribuiti, per cui $e$ è uguale per tutti gli RPC foglia. Si assume che $j$ sia grande abbastanza in modo che la radice dell'albero sottostante ad un RPC foglia sia sopra il livello $l$. Quindi, l'albero sottostante $U$ di un RPC interno $R$ è binario e completo. Sia $k$ l'altezza di $U$. Il numero di nodi di $U$ è $2^k-1$. Gli RPC figli di R sono $2^{k-1}$. In ogni round, ogni RPC deve calcolare un hash per ogni nodo del proprio albero sottostante $U$. Il massimo numero di nodi in un albero sottostante ad un RPC interno è $\hat{j} = 2^{\hat{k}-1}$, dove $\hat{k}$ è il più grande numero intero tale che $\hat{j} \leq j$, o in maniera equivalente $\hat{k} = \floor*{\log_2 (j+1)}$. L'altezza massima di un di un albero sottostante ad un RPC è $\hat{k}$.
+Sia $j$ il massimo numero di hash che un RPC può calcolare in un round. Si noti che $j$ è constante, poiché dipende dalla capacità computazionale dei nodi di un comitato. Sia $e$ il massimo numero di indirizzi il cui saldo viene modificato che un RPC foglia $R$ sia in grado di processare in un round. Ovviamente $e$ dipende da $j$ e come sono distribuiti gli indirizzi nello spazio degli indirizzi di cui $R$ è autorità. Tuttavia, per ipotesi gli indirizzi modificati sono uniformemente distribuiti, per cui $e$ è uguale per tutti gli RPC foglia. Si assume che $j$ sia grande abbastanza in modo che la radice dell'albero sottostante ad un RPC foglia sia sopra il livello $l$. Quindi, l'albero sottostante $U$ di un RPC interno $R$ è binario e completo. Sia $k$ l'altezza di $U$. Il numero di nodi di $U$ è $2^k-1$. Gli RPC figli di $R$ sono $2^{k-1}$. In ogni round, ogni RPC deve calcolare un hash per ogni nodo del proprio albero sottostante $U$. Il massimo numero di nodi in un albero sottostante ad un RPC interno è $\hat{j} = 2^{\hat{k}}-1$, dove $\hat{k}$ è il più grande numero intero tale che $\hat{j} \leq j$, o in maniera equivalente $\hat{k} = \floor*{\log_2 (j+1)}$. L'altezza massima di un di un albero sottostante ad un RPC è $\hat{k}$.
 
 Sia $S(N, f)$ un sistema di blockchain, avente un'architettura descritta nel Paragrafo~\ref{sec:architettura}, con $N$ nodi ed un carico di frequenza $f$.
 
@@ -138,7 +137,7 @@ Da notare che sia il numeratore che il denominatore rappresentano la dimensione 
 \end{proof}
 
 
-\begin{theorem}{(Scalabilità).}
+\begin{theorem}{(Scalabilità).}\label{th:scalability}
 Sia $S(N, f)$ una blockchain well-provisioned composta da $N$ nodi ed un carico di frequenza $f$. Per ogni $\alpha > 1$ tale che $a N$ è intero, la blockchain $\bar{S}(\alpha N, \alpha f)$ è well-provisioned, supponendo un carico uniformemente distribuito sullo spazio degli indirizzi.
 \end{theorem}
 
@@ -152,3 +151,52 @@ Subito dopo un raddoppio, $m/e$ è una potenza di 2, $g= \log_2 (m/e) +1$, per i
 
 Quindi, l'incremento richiesto da $\bar{S}$ a partire da $S$ del numero di CC ed RPC è al massimo di un fattore $\alpha$ e $\bar{S}$ ha $\alpha N$ nodi. Quindi $\bar{S}$ è well-provisioned.
 \end{proof}
+
+
+\section{Comunicazione inter-committee}
+
+Nel paragrafo precedente, nella descrizione dell'architettura, si è citata una forma di comunicazione tra comitati, o \emph{comunicazione inter-committee}, in modo che un comitato possa inviare dei dati ad un altro comitato del round successivo, oppure un nodo possa inviare la transazione candidata al CC responsabile.
+Un nodo non comunica con un comitato in unicast. Questo richiederebbe infatti la conoscenza di tutti le destinazioni, che è un problema di scalabilità considerando che i membri di ogni comitato cambiano ad ogni round. Un approccio basato su multicast può essere invece una soluzione, non utilizzando approcci tradizionali, come~\todo{citazione a pim sparse mode}, che poco si adattano alle specifiche richieste dall'architettura.
+
+In seguito è presentata un'analisi delle specifiche di ogni comunicazione multicast. Sia $N$ il numero dei nodi nella rete. Siano $N_C$, $N_R$, $e$, $m$, $\hat{j}$ e $q$ variabili con lo stesso significato dei precedenti paragrafi.
+Sia $n_{cr}$ un nodo generico nodo della rete che crea una transazione candidata. Sia $S$ la dimensione dello spazio degli indirizzi. Sia $R^i$ un Root-hash Pipeline Committee nel round $i$.
+
+Sono stati individuati cinque flussi multicast, riportati nella Tabella~\ref{tab:multicast}.
+
+\begin{sidewaystable}
+\centering
+\begin{tabular}{c|c|c|c|}
+\cline{2-4}
+                                                                      & \textbf{Gruppi multicast}               & \textbf{Subscriber}                                                                                                                        & \textbf{Publisher}                                  \\ \hline
+\multicolumn{1}{|c|}{$n_{cr} \rightarrow C_k$}                        & $N_C$                          & $\dfrac{N}{N_C + N_R}$                                                                                                            & $O(N)$                                       \\ \hline
+\multicolumn{1}{|c|}{$C_k^i \rightarrow R_m^{i+1}$}                   & $\ceil*{m/e}$                  & $\dfrac{N}{N_C + N_R}$                                                                                                            & $\dfrac{N_C N}{N_C + N_R} = O(N)$          \\ \hline
+\multicolumn{1}{|c|}{$R^i \rightarrow R^{i+1}$}                       & $\dfrac{\hat{j}+1}{2}^{h-i-1}$ & $\dfrac{N}{N_C + N_R}$                                                                                                            & $\dfrac{\hat{j}+1}{2}\dfrac{N}{N_C + N_R}$ \\ \hline
+\multicolumn{1}{|c|}{$C_k \rightarrow DHT$}                           & S                              & \begin{tabular}[c]{@{}c@{}}ciascuno storage node\\ si iscrive ai gruppi\\ relativi agli elementi\\ di cui è autorità\end{tabular} & $\dfrac{N}{N_C + N_R}$                     \\ \hline
+\multicolumn{1}{|c|}{$C_k^i \rightarrow C_k^{i+1}, \dots, C_k^{i+q}$} & $q N_C$                        & $\dfrac{N}{N_C + N_R}$                                                                                                            & $\dfrac{q N}{N_C + N_R}$                   \\ \hline
+\multicolumn{1}{|c|}{$R^i \rightarrow DHT$}                           & S                              & \begin{tabular}[c]{@{}c@{}}ciascuno storage node\\ si iscrive ai gruppi\\ relativi agli elementi\\ di cui è autorità\end{tabular} & $\dfrac{N}{N_C + N_R}$                     \\ \hline
+\end{tabular}
+\caption{Specifiche di ogni flusso multicast.}
+\label{tab:multicast}
+\end{sidewaystable}
+
+
+In particolare, si devono tenere in considerazione i seguenti aspetti per il multicast nella comunicazione tra comitati oppure per inviare una transazione candidata al CC autorità:
+
+\begin{itemize}
+	\item I membri di un comitato cambiano frequentemente, ad ogni round;
+	\item I gruppi multicast devono essere pronti in anticipo rispetto a quando devono essere effettivamente utilizzati;
+	\item I gruppi multicast sono necessari solo per un round.
+\end{itemize}
+
+Il problema della realizzazione di un multicast che rispetti queste specifiche rimane un problema aperto.
+
+L'ultimo aspetto, una volta realizzata la comunicazione multicast, riguarda l'accettazione di un messaggio da parte di un comitato $C_{out}$ ricevuto dal comitato $C_{in}$. Infatti, $C_{in}$ potrebbe essere composto da nodi malevoli, che possono o decidere di non inviare il messaggio o di cambiarne il contenuto.
+Un comitato $C_{out}$ interessato a ricevere messaggi da parte di comitato $C_{in}$, si iscrive ad un gruppo multicast come subscriber. $C_{in}$ invia i messaggi come publisher del gruppo multicast. Ogni membro del comitato $C_{in}$ invia lo stesso messaggio, che è ricevuto da ogni membro di $C_{out}$. $C_{out}$ accetta un messaggio $m$ da $C_{in}$ solo se $m$ è stato inviato da più della metà dei membri di $C_{in}$.
+
+\section{Discussione}
+
+In questo paragrafo si discute l'effettiva risoluzione del blockchain scalability trilemma, cercando di capire se la scalabilità limiti la decentralizzazione e/o la sicurezza, come in altri approcci presenti in letteratura.
+Riguardo la \textit{decentralizzazione}, anche se ogni nodo della rete ha un ruolo diverso nella creazione del blocco, i membri ad ogni comitato sono assegnati e cambiati periodicamente in modo randomico, come in~\cite{gilad2017algorand}.
+I ruoli sono quindi statisticamente omogenei. Quindi la scalabilità non impatta la decentralizzazione.
+
+Riguardo la \textit{sicurezza}, il Teorema~\ref{th:scalability} mostra come la scalabilità non riduce la dimensione di ogni singolo comitato. Molti attacchi, come quelli presentati nel Paragrafo~\ref{attacks}, richiedono che l'attaccante controlli la maggior parte dei nodi di un comitato. Tuttavia, quando i membri di un comitato sono selezionati in modo randomico, l'attacco è molto più difficile. Inoltre, utilizzando approcci basati su Proof-of-Stake, ed in generale protocolli di consenso distribuito robusti, si evitano attacchi Sybil. Quindi la scalabilità non ha impatto sulla sicurezza.

@@ -254,13 +254,13 @@ La tecnica della \emph{potatura}~\cite{ponnapalli2019scalable}, o \emph{pruning}
 
 \section{Distributed Hash Table}
 
-Una Distributed Hash Table (DHT) è un sistema di storage distribuito in grado di memorizzare dati sotto forma di coppie chiave-valore, in modo simile alle \emph{hash table}. Sono costruite su un \emph{keyspace}, ovvero l'insieme di tutte le chiavi, distribuite tra i nodi partecipanti. Se un nodo $n$ memorizza il valore $v$ associato alla chiave $k$, si dice che $n$ è \emph{autorità} per $k$. Molte implementazioni di DHT~\cite{maymounkov2002kademlia, ratnasamy2001scalable, stoica2001chord, zhao2004tapestry} permettono di effettuare un \emph{lookup}, l'operazione che consente di individuare il peer che detiene una certa risorsa, in modo efficiente, con un numero di scambi di messaggi e memoria dei peer sublineare, spesso $O(\log N)$, con $N$ il numero totale dei nodi della DHT (vedi Figura~\ref{fig:kadelia}).
+Una Distributed Hash Table (DHT) è un sistema di storage distribuito in grado di memorizzare dati sotto forma di coppie chiave-valore, in modo simile alle \emph{hash table}. Sono costruite su un \emph{keyspace}, ovvero l'insieme di tutte le chiavi, distribuite tra i nodi partecipanti. Se un nodo $n$ memorizza il valore $v$ associato alla chiave $k$, si dice che $n$ è \emph{autorità} per $k$. Molte implementazioni di DHT~\cite{maymounkov2002kademlia, ratnasamy2001scalable, stoica2001chord, zhao2004tapestry} permettono di effettuare un \emph{lookup}, l'operazione che consente di individuare il peer che detiene una certa risorsa, in modo efficiente, con un numero di scambi di messaggi e memoria dei peer sublineare, spesso $O(\log N)$, con $N$ il numero totale dei nodi della DHT (vedi Figura~\ref{fig:kademlia}).
 
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.87]{img/capuno/kademlia.pdf}
 	\caption{Rappresentazione della tabella di lookup di dimensione logaritmica rispetto al numero dei nodi in Kademlia.}
-	\label{fig:mht_proof}
+	\label{fig:kademlia}
 \end{figure}
 
 Una DHT presenta le seguenti proprietà:
