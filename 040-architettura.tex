@@ -2,6 +2,21 @@
 
 \section{Problematiche in approcci correnti}
 
+I sistemi correnti presentano aspetti che rendono le blockchain non scalabili. In particolare le tre criticità individuate sono:
+
+\begin{enumerate}
+	\item le nuove transazioni vengono inviate in broadcast a tutti i nodi della rete;
+	\item ogni nuovo blocco è ricevuto da tutti i nodi;
+	\item esiste un insieme dei nodi che processano tutte le nuove transazioni da includere nel prossimo blocco.
+\end{enumerate}
+
+Questi aspetti implicano che per poter processare un quantitativo di transazioni maggiori, si deve aumentare proporzionalmente la capacità computazionale e la banda dei singoli nodi (scalabilità \emph{verticale}). \'E preferibile invece una scalabilità \emph{orizzontale}, si può far fronte all'aumento di transazioni da processare aggiungendo nuovi nodi alla rete.
+
+Nella presente tesi, l'obiettivo è quello di progettare un'architettura che affronti i tre problemi prima menzionati, tralasciando gli aspetti legati alla scalabilità del protocollo di consenso distribuito. Infatti i tre aspetti sono del tutto indipendenti da quest'ultimo e sono rilevanti anche per protocolli di consenso \emph{light}~\cite{poon2016bitcoin}. Si tralasciano gli aspetti legati allo storage dello stato della blockchain, poiché affrontato in altri lavori, come presentato nel Paragrafo~\ref{sec:bernardini}.
+
+In letteratura, alcune proposte di architettura scalabile introducono lo \emph{sharding}, descritto nel Paragrafo~\ref{sec:sharding}. Tuttavia, come si è visto, assicurare l'atomicità delle transazioni è impegnativo in contesti in cui queste riguardano più shard (transazioni \emph{cross-shard}), che richiedono tecniche simili al 2PC o creazione di ulteriori transazioni per ogni input presenta in quella originaria. Altra criticità, più importante, riguarda a sicurezza: le shard piccole permettono all'architettura di scalare, ma sono meno sicure rispetto a quelle più grandi.
+
+
 \section{Aspetti centrali e definizioni di base}
 
 %Vediamo l'architettura proposta, in riferimento alla Figura~\ref{fig:architecture}.
