@@ -51,6 +51,13 @@ Infine si assume che non ci siano problemi di rete, per cui ogni nodo riceve tut
 
 In questo paragrafo è descritta l'architettura e il ruolo di ogni comitato dal momento in cui un nodo crea una transazione, fino alla sua conferma. La Figura~\ref{fig:architecture} mostra l'architettura e il flusso di informazioni scambiate tra i comitati.
 
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.82]{img/captre/bc.pdf}
+	\caption{Flusso delle informazioni dell'architettura proposta.}
+	\label{fig:architecture}
+\end{figure}
+
 Ogni nodo può creare una transazione. Come descritto nel paragrafo precedente, una nuova transazione deve contenere il saldo dei conti associati e le proof di integrità relative, ottenute durante il round precedente dagli storage node autorità per gli elementi di stato coinvolti nella transazione. Le nuove transazioni (candidate) non sono inviate in broadcast come nelle soluzioni tradizionali, ma ad un ristretto numero di nodi.
 
 Il ruolo di validazione e conferma delle nuove transazioni è eseguito dai \emph{Confirmation Committee} (\emph{CC}). Ogni CC è denotato con $C_k$, con $k = 1, \dots, N_c$, dove $N_c$ è il numero di CC. Quando è importante, si denota con $C_k^i$ il $k$-esimo Confirmation Committee relativo al round $i$. Come detto prima, per motivi di sicurezza, ogni Confirmation Committee tra un round e l'altro è formato da membri differenti. Il nodo che crea la transazione $t$, la invia a $C_k^i$ tale che $k = hash(t_s) \mod N_c$, dove $t_s$ è la sorgente della transazione $t$, e si dice che $C_k^i$ è \emph{responsabile} per $t$. Ogni nuova transazione $t$ è ricevuta da $C_k^i$ \emph{prima} del round dell'inizio del round $i$, in modo tale che $C_k^i$ possa processare $t$ durante il round $i$. L'insieme di transazioni per cui $C_k^i$ è responsabile è denotato $P(C_k^i)$. Si denota con $P^i = \cup_k P(C_k^i)$ l'insieme di tutte le transazioni processate da tutti i Confirmation Committee nel round $i$. Il risultato di un $C_k^i$ è una lista di transazioni validate e confermate denotato $A_k^i$, con $A_k^i \subseteq P(C_k^i)$.
