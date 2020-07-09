@@ -172,7 +172,7 @@ Quindi, l'incremento richiesto da $\bar{S}$ a partire da $S$ del numero di CC ed
 \section{Comunicazione inter-committee}
 
 Nel paragrafo precedente, nella descrizione dell'architettura, si è citata una forma di comunicazione tra comitati, o \emph{comunicazione inter-committee}, in modo che un comitato possa inviare dei dati ad un altro comitato del round successivo, oppure un nodo possa inviare la transazione candidata al CC responsabile.
-Un nodo non comunica con un comitato in unicast. Questo richiederebbe infatti la conoscenza di tutti le destinazioni, che è un problema di scalabilità considerando che i membri di ogni comitato cambiano ad ogni round. Un approccio basato su multicast può essere invece una soluzione, non utilizzando approcci tradizionali, come~\todo{citazione a pim sparse mode}, che poco si adattano alle specifiche richieste dall'architettura.
+Un nodo non comunica con un comitato in unicast. Questo richiederebbe infatti la conoscenza di tutti le destinazioni, che è un problema di scalabilità considerando che i membri di ogni comitato cambiano ad ogni round. Un approccio basato su multicast può essere invece una soluzione, non utilizzando approcci tradizionali, come~\cite{fenner2016protocol}, che poco si adattano alle specifiche richieste dall'architettura.
 
 In seguito è presentata un'analisi delle specifiche di ogni comunicazione multicast. Sia $N$ il numero dei nodi nella rete. Siano $N_C$, $N_R$, $e$, $m$, $\hat{j}$ e $q$ variabili con lo stesso significato dei precedenti paragrafi.
 Sia $n_{cr}$ un nodo generico nodo della rete che crea una transazione candidata. Sia $S$ la dimensione dello spazio degli indirizzi. Sia $R^i$ un Root-hash Pipeline Committee nel round $i$.
