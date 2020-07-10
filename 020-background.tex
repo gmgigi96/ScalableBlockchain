@@ -1,6 +1,31 @@
 \chapter{Background}
 
-\section{Bitcoin e Blockchain}
+\section{DLT e Blockchain}
+
+Un \emph{Distributed Ledger Technology}, o \emph{DLT}, è un registro distribuito, la cui copia è presente su tutti i partecipanti (o nodi) della rete, in cui ogni nodo in maniera indipendente dagli altri può apportare delle modifiche sotto il consenso di tutti gli altri. Ogni nodo della rete è in grado di creare una transazione che modifica lo stato del registro, ma questa non è accettata da un'autorità centralizzata come in sistemi tradizionali, bensì dalla maggioranza dei partecipanti. Infatti, ogni nodo può partecipare alla validazione e alla conferma di tutte le nuove transazioni.
+
+Il concetto fondamentale che regola una DLT è quello di \emph{consenso}. Il consenso specifica come i partecipanti si accordano sullo stato del registro. Quest'ultimo, oltre ad essere distribuito, è anche \emph{immutabile}. Infatti, una volta raggiunto il consenso su una transazione, questa non può essere annullata ed il suo effetto rimane indelebile.
+
+Le DLT si dividono in due categorie: \emph{permissioned} (o \emph{private}) e \emph{unpermissioned} (o \emph{pubbliche}). Nelle prime l'accesso è controllato da un'autorità che verifica l'autenticità del partecipante, il registro è quindi proprietà di un insieme di attori, ed il sistema è composto da nodi fidati (\emph{trusted}). Le seconde, argomento della presente tesi, permettono a chiunque di partecipare, non sono quindi proprietà di nessuna organizzazione e consentono a tutti di proporre delle modifiche. Il campo di applicazione è quello di database su scala globale, ad esempio per un sistema di cripto-valute, le cui informazioni hanno bisogno di essere immutabili (le transazioni confermate o il saldo associato ai conti degli utenti). Esse sono però soggette ad attacchi Sybil~\cite{douceur2002sybil}, di cui si parlerà in seguito. In genere le prestazioni delle DLT permissioned sono maggiori delle DLT unpermissioned. Nel resto della tesi si farà riferimento solamente alle DLT unpermissioned.
+
+Poiché i database tradizionali hanno un failure model nettamente differente da quello delle DLT, i protocolli di consenso utilizzati nei primi in ambiente distribuito, come~\cite{bernstein1987concurrency, raz1995dynamic}, non possono essere impiegati. Infatti, mentre nei database il fallimento di un nodo corrisponde ad un suo crash, software o hardware, che non gli permette di rispondere alla richieste, nelle seconde l'ambiente di esecuzione è più ostile. I nodi, denominati \emph{bizantini}, oltre ad avere dei crash, possono comportarsi in modo malevolo, rispondendo in modo errato e corrompendo altri nodi.
+Le DLT devono quindi adottare un protocollo di consenso che sia \emph{Byzantine Fault Tollerant} (\emph{BFT}), il cui nome deriva dal \textit{problema dei generali bizantini}.
+\textit{Proof-of-Work}~\cite{nakamoto2019bitcoin}, in cui si seleziona randomicamente un leader la cui probabilità dipende dalla sua potenza computazionale, \textit{Proof-of-Stake}~\cite{kiayias2017ouroboros}, \textit{Proof-of-Personhood}~\cite{borge2017proof}, sono esempi di protocolli BFT resistenti ad attacchi Sybil.
+
+Una \emph{blockchain} fa parte della classe delle DLT ed è una lista di blocchi semplicemente collegata, il cui inserimento è solo in modalità \emph{append}. Ogni blocco è identificato da un hash crittografico, calcolato sull'header del blocco stesso. Ogni blocco punta al nodo precedente specificandone l'hash. La sequenza di blocchi crea quindi una catena, in cui il primo è denominato \emph{genesis block} ed è specificato nell'algoritmo di consenso.
+
+In Bitcoin~\cite{nakamoto2019bitcoin}, un blocco è un contenitore formato da una sezione \textit{metadati}, composto dalla dimensione del blocco stesso, da un \textit{block header} di 80 byte e dalla lista di transazioni validate. Il block header è composto dall'hash del precedente blocco, dal \emph{root-hash} del Merkle Tree formato dalle transazioni contenute nel blocco, un \emph{timestamp}, ovvero il tempo di creazione del blocco, un \emph{difficulty target} e un \emph{nounce}, utilizzati nella fase di mining.
+La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.
+
+\begin{figure}
+	\centering
+	\includegraphics[]{img/capuno/blockchain_bitcoin.pdf}
+	\caption{Esempio di blockchain in Bitcoin. Ogni blocco punta al blocco precedente specificandone l'hash dell'header.}
+	\label{fig:bitcoin_blockchain}
+\end{figure}
+
+
+\section{Bitcoin}
 Bitcoin è una tecnologia open-source per lo scambio di valute, denominate \emph{bitcoin}, decentralizzato, presentato nel 2008 da una persona anonima, con lo pseudonimo di Satoshi Nakamoto \cite{nakamoto2019bitcoin}.
 A differenza di valute tradizionali che esistono fisicamente sotto forma di banconote, i bitcoin sono monete virtuali. Esse vengono scambiate tra i partecipanti alla rete Bitcoin che comunicano mediante il protocollo Bitcoin. Quindi con il termine Bitcoin, si indicano vari aspetti: la tecnologia in sé, lo stack protocollare di comunicazione adottato tra i partecipanti alla rete e la valuta scambiata.
 Bitcoin è una rete P2P, a cui partecipano nodi chiamati \emph{peer}, in cui non esistono nodi speciali o più importanti di altri, come nei sistemi di pagamento elettronici tradizionali, in cui c'è un server centrale che gestisce tutti i pagamenti.
@@ -102,22 +127,6 @@ Quando gli altri miner ricevono il blocco minato da un altro miner, smettono di 
 
 Può capitare che due miner nella rete trovino riescano a minare quasi contemporaneamente un blocco, per cui i vicini potrebbero lavorare a loro volta su viste della blockchain differenti. Questo genera nella blockchain delle \emph{fork}, per cui i nodi nella rete hanno visioni differenti della blockchain stessa. Questo problema viene risolto da ogni nodo scegliendo il ramo più lungo, in questo modo si converge ad una visione comune della blockchain.
 
-
-\subsection{Blockchain}\label{sec:blockchain}
-
-La blockchain è il registro contenente tutte le transazioni accettate, condivisa da tutti i nodi della rete. Essa è una lista semplicemente collegata i cui nodi sono i blocchi. I blocchi sono connessi al contrario, per cui ogni blocco punta al nodo precedente. Ogni blocco è identificato da un hash crittografico, calcolato con l'algoritmo SHA256 sull'header del blocco stesso. Ogni blocco punta al nodo precedente specificandone l'hash. La sequenza di blocchi crea quindi una catena, fino ad arrivare al primo blocco creato, denominato \emph{genesis block}, creato nel 2009, e direttamente codificato nel client software di Bitcoin, per cui conosciuto da tutti i nodi della rete.
-
-Un blocco è un contenitore formato da una sezione metadati, composto dalla dimensione del blocco stesso, da un block header di 80 byte e dalla lista di transazioni validate. Il block header è composto dall'hash del precedente blocco, dal \emph{root-hash} del Merkle Tree formato dalle transazioni contenute nel blocco, un \emph{timestamp}, ovvero il tempo di creazione approssimato del blocco, un \emph{difficulty target} e un \emph{nounce}, utilizzati nella fase di mining.
-La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.
-
-\begin{figure}
-	\centering
-	\includegraphics[]{img/capuno/blockchain_bitcoin.pdf}
-	\caption{Esempio di blockchain in Bitcoin. Ogni blocco punta al blocco precedente specificandone l'hash dell'header}
-	\label{fig:bitcoin_blockchain}
-\end{figure}
-
-\todo{definire blockchain pubbliche e private nel'introduzione a blockchain}
 
 \subsection{Attacchi noti}\label{attacks}
 
