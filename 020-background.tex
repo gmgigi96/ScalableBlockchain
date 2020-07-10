@@ -1,6 +1,6 @@
 \chapter{Background}
 
-\section{DLT e Blockchain}
+\section{DLT e Blockchain}\label{sec:blockchain}
 
 Un \emph{Distributed Ledger Technology}, o \emph{DLT}, è un registro distribuito, la cui copia è presente su tutti i partecipanti (o nodi) della rete, in cui ogni nodo in maniera indipendente dagli altri può apportare delle modifiche sotto il consenso di tutti gli altri. Ogni nodo della rete è in grado di creare una transazione che modifica lo stato del registro, ma questa non è accettata da un'autorità centralizzata come in sistemi tradizionali, bensì dalla maggioranza dei partecipanti. Infatti, ogni nodo può partecipare alla validazione e alla conferma di tutte le nuove transazioni.
 
@@ -192,9 +192,9 @@ La sicurezza deve essere il requisito fondamentale in una blockchain. Se la sicu
 
 \section{Strutture dati autenticate}\label{sec:ads}
 
-Come si è visto nella Paragrafo~\ref{sec:blockchain}, ogni block header della blockchain contiene un riassunto di tutte le transazioni presenti nel blocco, denominato \emph{root-hash}, ed ottenuto da un Merkle Tree (MHT). Esso fa parte della famiglia delle \emph{strutture dati autenticate}.
+Come si è visto nella Paragrafo~\ref{sec:blockchain}, ogni block header della blockchain contiene un riassunto di tutte le transazioni presenti nel blocco, denominato \emph{root-hash}, ed ottenuto da un \textit{Merkle Tree} (\textit{MHT}). Esso fa parte della famiglia delle \emph{strutture dati autenticate}.
 
-Una struttura dati autenticata (ADS) è una struttura dati contenente valori che permette una verifica di integrità, ovvero un client fidato può verificare l'autenticità di una risposta ottenuta da un server non fidato mediante una prova, denominata \emph{proof}. In altre parole, le operazioni effettuate da una parte esterna non fidata, denominato \emph{prover}, possono essere verificate efficientemente da un client, il \emph{verifier}.
+Una struttura dati autenticata (ADS) è una struttura dati che permette una verifica di integrità. Permettono ad un client di verificare l'autenticità e l'integrità di una risposta ottenuta da un server non fidato mediante una prova, denominata \emph{proof}. In altre parole, le operazioni effettuate da una parte esterna non fidata, denominato \emph{prover}, possono essere verificate efficientemente da un client, il \emph{verifier}.
 
 Supponiamo di trovarci nel seguente scenario. Un client ha bisogno di memorizzare una certa quantità di dati che eccede le sue disponibilità di memorizzazione fisica. Può memorizzare i suoi dati su un server esterno che ha una grande capacità di memorizzazione, come ad esempio un servizio di cloud storage. Il client vuole essere sicuro che la versione dei file che memorizza in cloud sia l'ultima e che nessuno possa modificare il contenuto dei suoi file. Questo problema può essere risolto mediante le strutture dati autenticate, senza che il client memorizzi l'intera struttura dati e senza memorizzare l'hash di ogni singolo file. In quest'ultimo caso infatti dovrebbe memorizzare un numero di hash lineare con il numero di file che ha memorizzato in cloud. Applicazioni del genere sono molto frequenti, anche nel caso di Bitcoin, in cui esistono client \emph{leggeri}, i cosiddetti \emph{thin client}, che memorizzano solo l'header dei blocchi della blockchain, mentre tutte le transazioni contenute nei blocchi sono memorizzati su un server esterno. Una realizzazione di un protocollo efficiente che fa uso di ADS si può trovare in \cite{pennino2019pipeline} e \cite{gdm}.
 
@@ -266,11 +266,11 @@ Un client possiede solo una copia locale del root-hash, mentre i dati sono su un
 	\label{alg:rh_proof}
 \end{algorithm}
 
-La tecnica della \emph{potatura}~\cite{ponnapalli2019scalable}, o \emph{pruning}, consente di ridurre lo spazio occupato da un Merkle Tree, qualora non sia necessario rispondere a query su un certo insieme di chiavi, preservando la capacità di generare proof per le chiavi necessarie. Si ottiene rimuovendo le foglie non necessarie e lasciando gli hash delle radici dei sotto alberi al posto di esse. La Figura~\ref{fig:pruning} mostra un esempio di MHT potato.
+La tecnica della \emph{potatura}~\cite{ponnapalli2019scalable}, o \emph{pruning}, consente di ridurre lo spazio occupato da un Merkle Tree, qualora non sia necessario rispondere a query su un certo insieme di chiavi, preservando la capacità di generare proof per le chiavi necessarie. Si ottiene rimuovendo le foglie non necessarie e lasciando gli hash delle radici dei sotto alberi al posto di esse. La Figura~\ref{fig:pruning} mostra un esempio di MHT potato.\todo{fare figura mht potato}
 
 \section{Distributed Hash Table}
 
-Una Distributed Hash Table (DHT) è un sistema di storage distribuito in grado di memorizzare dati sotto forma di coppie chiave-valore, in modo simile alle \emph{hash table}. Sono costruite su un \emph{keyspace}, ovvero l'insieme di tutte le chiavi, distribuite tra i nodi partecipanti. Se un nodo $n$ memorizza il valore $v$ associato alla chiave $k$, si dice che $n$ è \emph{autorità} per $k$. Molte implementazioni di DHT~\cite{maymounkov2002kademlia, ratnasamy2001scalable, stoica2001chord, zhao2004tapestry} permettono di effettuare un \emph{lookup}, l'operazione che consente di individuare il peer che detiene una certa risorsa, in modo efficiente, con un numero di scambi di messaggi e memoria dei peer sublineare, spesso $O(\log N)$, con $N$ il numero totale dei nodi della DHT (vedi Figura~\ref{fig:kademlia}).
+Una \textit{Distributed Hash Table} (\textit{DHT}) è un sistema di storage distribuito in grado di memorizzare dati sotto forma di coppie chiave-valore, in modo simile alle \emph{hash table}. Sono costruite su un \emph{keyspace}, ovvero l'insieme di tutte le chiavi, distribuite tra i nodi partecipanti. Se un nodo $n$ memorizza il valore $v$ associato alla chiave $k$, si dice che $n$ è \emph{autorità} per $k$. Molte implementazioni di DHT~\cite{maymounkov2002kademlia, ratnasamy2001scalable, stoica2001chord, zhao2004tapestry} permettono di effettuare un \emph{lookup}, l'operazione che consente di individuare il peer che detiene una certa risorsa, in modo efficiente, con un numero di scambi di messaggi e memoria dei peer sublineare, spesso $O(\log N)$, con $N$ il numero totale dei nodi della DHT (vedi Figura~\ref{fig:kademlia}).
 
 \begin{figure}
 	\centering
