@@ -203,7 +203,7 @@ Un'implementazione efficiente di un'ADS è il Merkle Tree, utilizzato per la rea
 \begin{figure}
 	\centering
 	\includegraphics{img/capuno/mht.pdf}
-	\caption{Un esempio di Merkle Tree.}
+	\caption{Un esempio di Merkle Tree. $h$ è la funzione di hash.}
 	\label{fig:mht}
 \end{figure}
 
@@ -214,7 +214,6 @@ Come ogni ADS, ad una richiesta \emph{T.get(k)}, dove si richiede il valore $v$ 
 	\begin{algorithmic}
 		\Procedure{get\_proof}{$k$}
 			\State{Sia $n$ la foglia di $T$ associato a $k$}
-			\State{Sia $p$ il cammino da $v$ al root}
 			\State{$P \leftarrow [~]$}
 			\While{$n.parent \neq T.root$}
 				\If{$n.parent.right = n$}	\Comment{$n$ è un figlio destro}
@@ -233,12 +232,12 @@ Come ogni ADS, ad una richiesta \emph{T.get(k)}, dove si richiede il valore $v$ 
 	\label{alg:proof}
 \end{algorithm}
 
-La Figura~\ref{fig:mht_proof} mostra un esempio di proof, rappresentata con linee tratteggiate per il valore ???. Considerato il cammino $p$ da ??? al root, rappresentato in figura con una linea punteggiata, si selezionano i nodi ???, fratelli dei nodi percorsi in $p$. La proof risultante è quindi la lista di coppie [(???, ???)].
+La Figura~\ref{fig:mht_proof} mostra un esempio di proof, rappresentata dalla lista composta dai nodi grigi per il valore $v_5$. Considerato il cammino $p$ da $v_5$ al root, rappresentato in figura con una linea tratteggiata, si selezionano i nodi $H_6$, $H_{78}$ e $H_{1234}$, fratelli dei nodi percorsi in $p$. La proof risultante è quindi la lista di coppie $[(H_6, L), (H_{78}, L), (H_{1234}, R)]$.
 
 \begin{figure}
 	\centering
-	\includegraphics{img/capuno/proof.pdf}
-	\caption{Proof di ??? in un Merkle Tree. Essa è formata dai nodi tratteggiati.}
+	\includegraphics[scale=1.4]{img/capuno/proof.pdf}
+	\caption{Proof di $v_5$ in un Merkle Tree. Essa è lista composta dai nodi in grigio.}
 	\label{fig:mht_proof}
 \end{figure}
 
@@ -255,9 +254,9 @@ Un client possiede solo una copia locale del root-hash, mentre i dati sono su un
 			\For{$i \leftarrow 1$ to $L$}
 				\State $Tag, h_{p_i} \leftarrow p[i]$
 				\If{$Tag = R$}
-					\State $h_{i+1} \leftarrow hash(h_{p_i} \oplus h_i)$	\Comment{$\oplus$: concatenazione degli hash}
+					\State $h_{i+1} \leftarrow hash(h_{p_i} || h_i)$
 				\Else
-					\State $h_{i+1} \leftarrow hash(h_i \oplus h_{p_i})$				
+					\State $h_{i+1} \leftarrow hash(h_i || h_{p_i})$				
 				\EndIf
 			\EndFor
 			\Return $h_L$
