@@ -245,7 +245,7 @@ Un Merkle Tree utilizza uno spazio $O(|V|)$ e una dimensione della proof, un tem
 
 Un client possiede solo una copia locale del root-hash, mentre i dati sono su un server non fidato, ad esempio su cloud. Per verificare la veridicità del valore $v$ associato alla chiave $k$ ottenuto a seguito di una richiesta di \emph{get(k)} al server, il client calcola il root-hash dalla proof associata a $v$ e da $v$ stesso, con l'Algoritmo~\ref{alg:rh_proof}.
 
-\begin{algorithm}
+\begin{algorithm}[h]
 	\caption{Calcolo del root hash dalla proof}
 	\begin{algorithmic}
 		\Procedure{roothash\_from\_proof}{$p,v$}
@@ -265,7 +265,14 @@ Un client possiede solo una copia locale del root-hash, mentre i dati sono su un
 	\label{alg:rh_proof}
 \end{algorithm}
 
-La tecnica della \emph{potatura}~\cite{ponnapalli2019scalable}, o \emph{pruning}, consente di ridurre lo spazio occupato da un Merkle Tree, qualora non sia necessario rispondere a query su un certo insieme di chiavi, preservando la capacità di generare proof per le chiavi necessarie. Si ottiene rimuovendo le foglie non necessarie e lasciando gli hash delle radici dei sotto alberi al posto di esse. La Figura~\ref{fig:pruning} mostra un esempio di MHT potato.\todo{fare figura mht potato}
+La tecnica della \emph{potatura}~\cite{ponnapalli2019scalable}, o \emph{pruning}, consente di ridurre lo spazio occupato da un Merkle Tree, qualora non sia necessario rispondere a query su un certo insieme di chiavi, preservando la capacità di generare proof per le chiavi necessarie. Si ottiene rimuovendo le foglie non necessarie e lasciando gli hash delle radici dei sottoalberi al posto di esse. La Figura~\ref{fig:pruning} mostra un esempio di MHT potato.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{img/capuno/pruned_mht.pdf}
+	\caption{Esempio di Merkle Tree potato. Un nodo memorizza solo una parte dei valori ed i corrispettivi hash (nodi in nero), e le radici dei sottoalberi dei valori che non memorizza (nodi in grigio).}
+	\label{fig:pruning}
+\end{figure}
 
 \section{Distributed Hash Table}
 
