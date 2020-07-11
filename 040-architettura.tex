@@ -66,13 +66,14 @@ $C_k^i$, affinché possa validare correttamente le transazioni, per ogni transaz
 
 Ogni $C_k^i$ esegue il seguente algoritmo, tramite un protocollo di consenso:
 
-\paragraph*{Algoritmo 1 (Comportamento dei Confirmation Committee)}\todo{cambiare stile scrittura}
+\begin{algo}{(Comportamento dei Confirmation Committee)}
 \begin{enumerate}
 	\item Verifica che ogni transazione in $P(C_k^i)$ rispetti le regole sintattiche e le proof non sono scadute. Non accetta le transazioni che non passano queste verifiche, generando $P'(C_k^i) \subseteq P(C_k^i)$.
 	\item Seleziona una permutazione $\bar{T}$ di $P'(C_k^i)$.
 	\item Sia $\widetilde{T}$ la concatenazione di $A_k^{i-q}, \dots, A_k^{i-1}$. Per ogni sorgente nelle transazioni in $\bar{T}$, considera l'ultimo saldo tra i conti delle transazioni in $\widetilde{T}$ e i conti forniti dalle proof delle transazioni in $\bar{T}$.
 	\item Esegui le transazioni in $\bar{T}$ e verifica che il saldo risultante di ogni transazione non scenda sotto-zero. Le transazioni che non rispettano questa regola sono scartate. Il risultato è la lista $A_k^i$ ottenuto da $\bar{T}$ dove le transazioni scartate sono omesse.	
 \end{enumerate}
+\end{algo}
 
 Le transazioni in $A_k^i$ si considerano \emph{confermate} e saranno inserite nel blocco $B_i$. Per permettere ai Confirmation Committee dei round successivi di effettuare il time-updating, $C_k^i$ invia $A_k^i$ a $C_k^{i+1}, \dots, C_k^{i+q}$ ed anche ad altri comitati, come mostrato in seguito.
 
