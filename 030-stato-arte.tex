@@ -26,7 +26,7 @@ Ogni round è diviso in due fasi: (1) proposta del nuovo blocco e (2) conferma d
 In ogni fase viene eseguita una \emph{lotteria crittografica} in cui si selezionano i peer, in modo randomico e sulla base dei loro pesi, che si occuperanno di uno specifico compito all'interno della fase stessa. Ad ogni utente $i$ è infatti assegnato un peso $w_i$ sulla base dei soldi che possiede nel proprio conto. Se $W = \sum_i w_i$ è la somma di tutti i pesi degli utenti del sistema, la probabilità che il peer $i$ sia selezionato è proporzionale a $w_i/W$. La selezione è basata sulle Verifiable Random Function (VRF)~\cite{micali1999verifiable}, una funziona che genera un \emph{hash} ed una \emph{proof}. L'\emph{hash} è un numero pseudo-randomico basato su un \emph{seed}, conosciuto da tutta la rete, e su una chiave privata $sk$, mentra la \emph{proof} permette di verificare l'hash data la chiave pubblica $pk$ associata ad $sk$.
 Il sorteggio crittografico è basato sull'Algoritmo~\ref{alg:sortition}.
 \begin{algorithm}
-	\caption{L'algoritmo utilizzato per la lotteria crittografica in Algorand}
+	\caption{Selezione dei comitati in Algorand.}
 	\begin{algorithmic}
 		\Procedure{sortition}{$sk, seed, \tau, role, w, W$}
 			\State{$\langle hash, \pi \rangle \leftarrow$\Call{VRF$_{sk}$}{$seed || role$}}
