@@ -1,5 +1,8 @@
 \chapter{Stato dell'arte}
 
+In questo capitolo si presenta una panoramica riguardo i risultati più significativi in tema scalabilità della blockchain. Si descrive il nuovo algoritmo di consenso proposto da Algorand, per poi introdurre un approccio che consente ai nodi che si occupano di validazione delle transazioni di non dover memorizzare l'intero stato della blockchain, che verrà ripreso nel prossimo capitolo in fase di definizione dell'architettura proposta nella presente tesi. Infine si mostra un approccio architetturale alla scalabilità basato sullo sharding, effettuando un'analisi sull'impatto che la scalabilità ha sulla sicurezza.
+
+
 \section{Algorand}
 
 Algorand~\cite{gilad2017algorand, chen2019algorand} è un nuovo sistema di blockchain, progettato da Silvio Micali, professore del MIT e vincitore del premio Turing nel 2012. Algorand è infatti in grado di confermare le nuove transazioni nell'ordine di un minuto scalando su numerosi utenti. A differenza di Bitcoin e altre blockchain simili, Algorand non usa per raggiungere il consenso Proof-of-Work. In Bitcoin ogni blocco viene aggiunto alla blockchain ogni 10 minuti, tramite una gara crittografica costosa in termini di potenza computazionale, e di conseguenza di costo di elettricità, il che si traduce in uno spreco di risorse per tutti i nodi della rete che non hanno trovato la soluzione al puzzle crittografico. Questa soluzione chiaramente non scala: un blocco ogni 10 minuti a livello globale non è sufficiente per gestire il gran numero di transazioni che verrebbero generate.
