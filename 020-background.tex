@@ -22,7 +22,7 @@ La figura~\ref{fig:bitcoin_blockchain} mostra un esempio di blockchain.
 
 \begin{figure}
 	\centering
-	\includegraphics[]{img/capuno/blockchain_bitcoin.pdf}
+	\includegraphics{img/capuno/blockchain_bitcoin.pdf}
 	\caption{Esempio di blockchain in Bitcoin. Ogni blocco punta al blocco precedente specificandone l'hash dell'header.}
 	\label{fig:bitcoin_blockchain}
 \end{figure}
@@ -49,9 +49,9 @@ In particolare, il modello di riferimento è quello della crittografia asimmetri
 In crittografia, una chiave privata è usata per firmare un messaggio, o in questo caso una transazione, mentre la chiave pubblica, conosciuta da tutti i nodi della rete, per validare la firma del messaggio. Infatti, semplificando, la chiave pubblica è usata per ricevere i bitcoin, mentre la chiave privata per spenderli, secondo delle modalità che saranno note nel proseguimento della lettura dei prossimi paragrafi, in cui si mostra la creazione di una transazione da parte di un peer, e quindi le prove crittografiche che deve mostrare in modo da poter spendere i suoi bitcoin.
 In una transazione, l'indirizzo di destinazione è indicato da un \emph{bitcoin address}, che deriva dalla chiave pubblica del peer, mediante una serie di funzioni hash, come illustrato nella Figura~\ref{fig:bit_address}.
 
-\begin{figure}[]
+\begin{figure}
 	\centering
-	\includegraphics[]{img/capuno/PubKeyToAddr.png}
+	\includegraphics{img/capuno/PubKeyToAddr.png}
 	\caption{Creazione di un indirizzo Bitcoin a partire dalla chiave pubblica~\emph{\cite{bitaddress2020}}.}
 	\label{fig:bit_address}
 \end{figure}
@@ -109,7 +109,7 @@ dove $T_{in}$ e $T_{out}$ indicano l'input e l'output di una transazione $T$, ri
 Gli script sono il sistema con cui i peer Bitcoin validano le transazioni. Come si è detto in precedenza, ad ogni UTXO è associato un locking script, che rappresenta le condizioni che un nodo deve soddisfare per poter utilizzare i bitcoin contenuti in essa. L'input di una transazione, riferito ad uno specifico UTXO, deve fornire un unlocking script, che contiene solitamente una firma che sblocca i fondi. Durante la validazione di una transazione, il peer esegue prima l'unlocking script e usa il suo output come input per il locking script. Se non ci sono errori e le condizioni nel locking script sono soddisfatte, ovvero l'intera operazione restituisce \emph{true}, allora la transazione è considerata valida.
 Gli script sono scritti in un linguaggio stack-based, in cui sono presenti istruzioni aritmetico-logiche, istruzioni per il calcolo di hash, di verifiche di chiavi pubbliche, istruzione condizionale, ma non loop, il che lo rende \emph{Turing incompleto}. Questo fa si che non è possibile creare un loop infinito e causare quindi un \emph{Denial-of-Service}. Grazie ad un linguaggio di scripting è possibile scrivere un'infinità di script che danno modo di esprimere qualsiasi condizione. La più usata è certamente la \emph{Pay to public key hash}, nota anche con P2PKH, che consente di specificare l'indirizzo Bitcoin a cui trasferire una certa somma di bitcoin. La Figura~\ref{fig:p2pkh} mostra un esempio di locking e unlocking script per una transazione P2PKH. \'E possibile creare anche fondi sbloccabili solo da più utenti insieme o anche da una certa data in poi. Questi sono solo alcuni degli esempi che è possibile creare.
 
-\begin{figure}[]
+\begin{figure}
 	\centering
 	\includegraphics[scale=0.78]{img/capuno/p2pkh.pdf}
 	\caption{Esempio di locking ed unlocking script per una transazione P2PKH. La transazione è generata dall'utente $A$ che deve dimostrare nell'unlocking script la propria identità.}
@@ -125,7 +125,7 @@ Finora si è parlato dei miner che cercano di creare un nuovo blocco da aggiunge
 Quando una transazione viene generata da un qualsiasi peer della rete, essa viene inviata in broadcast a tutti i nodi della rete. Ogni nodo che riceve una transazione, prima di inviarla ai peer successivi, effettua numerosi controlli di validità, come la conformità alle regole sintattiche e regole di consenso, come (1) verificare che la transazione non faccia \emph{double spending}, ovvero si utilizza più di una volta la stessa UTXO, confrontando gli input della transazione con gli output delle transazioni nei blocchi della blockchain e con quelle del pool delle transazioni, (2) verificare che la somma degli input sia maggiore della somma degli output, e (3) verificare che l'output dell'unlocking script di ogni input sblocchi il locking script dell'UTXO a cui l'input si riferisce. Se una transazione soddisfa tutti questi requisiti, viene inserita nel pool delle transazioni del peer, uno spazio di memoria temporaneo in cui risiedono le transazioni valide in attesa di essere inserite in un blocco, per poi essere inviata in broadcast ad ogni peer vicino. Ogni peer effettua tutti questi controlli. A questo punto, ogni miner sceglie le transazioni che formeranno il prossimo blocco, denominato \emph{candidate block}, dal pool delle transazioni. I primi 50 kilobyte di un blocco sono formati da quelle transazioni ad \emph{alta priorità}: la priorità viene calcolata in base all'età dell'UTXO che dovrà essere spesa, ovvero in base alla profondità a cui si trova nella blockchain la transazione contenente l'UTXO rispetto al blocco corrente. La formula per il calcolo della priorità è la seguente:
 
 \begin{equation*}
-	Priorità = \frac{\sum_i  value(T_i) * age(T_i)}{size(T)}
+	Priority = \frac{\sum_i  value(T_i) * age(T_i)}{size(T)}
 \end{equation*}
 
 dove $value(T_i)$ è il valore dell'input $i$ della transazione $T$ espresso in satoshi, $age(T_i)$ è la profondità dell'UTXO a cui si riferisce l'input $i$ della transazione nella blockchain, e $size(T)$ è la dimensione della transazione espressa in byte.
@@ -248,7 +248,7 @@ Un Merkle Tree utilizza uno spazio $O(|V|)$ e una dimensione della proof, un tem
 
 Un client possiede solo una copia locale del root-hash, mentre i dati sono su un server non fidato, ad esempio su cloud. Per verificare la veridicità del valore $v$ associato alla chiave $k$ ottenuto a seguito di una richiesta di \emph{get(k)} al server, il client calcola il root-hash dalla proof associata a $v$ e da $v$ stesso, con l'Algoritmo~\ref{alg:rh_proof}.
 
-\begin{algorithm}[h]
+\begin{algorithm}
 	\caption{Calcolo del root hash dalla proof}
 	\begin{algorithmic}
 		\Procedure{roothash\_from\_proof}{$p,v$}
@@ -272,7 +272,7 @@ La tecnica della \emph{potatura}~\cite{ponnapalli2019scalable}, o \emph{pruning}
 
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.8]{img/capuno/pruned_mht.pdf}
+	\includegraphics[scale=0.78]{img/capuno/pruned_mht.pdf}
 	\caption{Esempio di Merkle Tree potato. Un nodo memorizza solo una parte dei valori ed i corrispettivi hash (nodi in nero), e le radici dei sottoalberi dei valori che non memorizza (nodi in grigio).}
 	\label{fig:pruning}
 \end{figure}
